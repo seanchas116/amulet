@@ -1,5 +1,5 @@
 
-#include <amulet/method.h>
+#include <amulet/method.hh>
 #include <gtest/gtest.h>
 
 AMULET_METHOD2(sliced, size_t, start, size_t, length,
