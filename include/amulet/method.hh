@@ -44,13 +44,13 @@
       AMULET_METHOD_ARG_DEFS(TYPE_ARG_ARRAY) \
       __VA_ARGS__ \
     }; \
+    template <typename T> \
+    auto operator|(T &self, detail::NAME##_args &&args) { \
+      return args.apply_(self); \
+    } \
   } \
   detail::NAME##_args NAME(AMULET_METHOD_ARG_LIST(TYPE_ARG_ARRAY)) { \
     return detail::NAME##_args(AMULET_METHOD_ARG_CALL(TYPE_ARG_ARRAY)); \
-  } \
-  template <typename T> \
-  auto operator|(T &self, detail::NAME##_args &&args) -> decltype(args.apply_(self)) { \
-    return args.apply_(self); \
   }
 
 #define AMULET_METHOD_TEMPLATE(NAME, TEMPLATE_ARG_ARRAY, TYPE_ARG_ARRAY, ...) \
@@ -64,14 +64,14 @@
       AMULET_METHOD_ARG_DEFS(TYPE_ARG_ARRAY) \
       __VA_ARGS__ \
     }; \
+    template <typename T, AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
+    auto operator|(T &self, NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)> &&args) { \
+      return args.apply_(self); \
+    } \
   } \
   template <AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
   detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)> NAME(AMULET_METHOD_ARG_LIST(TYPE_ARG_ARRAY)) { \
     return detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)>(AMULET_METHOD_ARG_CALL(TYPE_ARG_ARRAY)); \
-  } \
-  template <typename T, AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
-  auto operator|(T &self, detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)> &&args) -> decltype(args.apply_(self)) { \
-    return args.apply_(self); \
   }
 
 #define AMULET_METHOD0(NAME,  ...) \
