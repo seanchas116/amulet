@@ -1,6 +1,8 @@
 
 #include <amulet/method.hh>
 #include <gtest/gtest.h>
+#include <vector>
+#include <initializer_list>
 
 AMULET_METHOD2(sliced, size_t, start, size_t, length,
   template <typename T>
@@ -13,19 +15,29 @@ AMULET_METHOD2(sliced, size_t, start, size_t, length,
 
 AMULET_METHOD1(at, size_t, index,
   template <typename T>
-  auto apply_(T &self) -> decltype(self.at(index)) {
+  auto apply_(T &self) {
     return self.at(index);
   }
 )
 
 AMULET_METHOD0(size,
   template <typename T>
-  auto apply_(T &self) -> decltype(self.size()) {
+  auto apply_(T &self) {
     return self.size();
   }
 )
 
-TEST(method, method) {
+AMULET_METHOD_TEMPLATE(apply,
+  (1, ((typename, TUnaryFunc))),
+  (1, ((TUnaryFunc, f))),
+  template <typename T>
+  auto apply_(T &self) {
+    return f(self);
+  }
+)
+
+TEST(method, method)
+{
   std::vector<double> xs = {1.0, 1.5, 2.0};
   const auto &const_xs = xs;
   EXPECT_EQ(3, xs | size());
@@ -35,3 +47,9 @@ TEST(method, method) {
   EXPECT_EQ(sub, xs | sliced(0, 2));
 }
 
+TEST(method, method_template)
+{
+  double x = 1.5;
+  double y = x | apply([](double x){return x * x;});
+  EXPECT_EQ(1.5 * 1.5, y);
+}

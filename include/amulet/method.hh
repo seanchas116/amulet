@@ -1,3 +1,4 @@
+#pragma once
 
 #include <boost/preprocessor.hpp>
 
@@ -49,6 +50,27 @@
   } \
   template <typename T> \
   auto operator|(T &self, detail::NAME##_args &&args) -> decltype(args.apply_(self)) { \
+    return args.apply_(self); \
+  }
+
+#define AMULET_METHOD_TEMPLATE(NAME, TEMPLATE_ARG_ARRAY, TYPE_ARG_ARRAY, ...) \
+  namespace detail { \
+    template <AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
+    struct NAME##_args { \
+      NAME##_args(AMULET_METHOD_ARG_LIST(TYPE_ARG_ARRAY)) \
+      BOOST_PP_IF(BOOST_PP_ARRAY_SIZE(TYPE_ARG_ARRAY), : , ) \
+      AMULET_METHOD_ARG_INITS(TYPE_ARG_ARRAY) \
+      {} \
+      AMULET_METHOD_ARG_DEFS(TYPE_ARG_ARRAY) \
+      __VA_ARGS__ \
+    }; \
+  } \
+  template <AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
+  detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)> NAME(AMULET_METHOD_ARG_LIST(TYPE_ARG_ARRAY)) { \
+    return detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)>(AMULET_METHOD_ARG_CALL(TYPE_ARG_ARRAY)); \
+  } \
+  template <typename T, AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY)> \
+  auto operator|(T &self, detail::NAME##_args<AMULET_METHOD_ARG_CALL(TEMPLATE_ARG_ARRAY)> &&args) -> decltype(args.apply_(self)) { \
     return args.apply_(self); \
   }
 
