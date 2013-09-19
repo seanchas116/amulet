@@ -14,8 +14,6 @@ public:
   RangeEnumeratorImpl(const TSourceRange &source) :
     m_source(source)
   {
-    m_iter = source.begin();
-    m_end = source.end();
   }
   value_type current() const
   {
@@ -23,17 +21,24 @@ public:
   }
   bool move_next()
   {
-    ++m_iter;
+    if (m_started) {
+      ++m_iter;
+    } else {
+      m_iter = m_source.begin();
+      m_end = m_source.end();
+      m_started = true;
+    }
     return m_iter != m_end;
   }
   void reset()
   {
-    m_iter = m_source.begin();
+    m_started = false;
   }
 
 private:
 
   const TSourceRange &m_source;
+  bool m_started = false;
   typename TSourceRange::const_iterator m_iter, m_end;
 };
 

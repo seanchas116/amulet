@@ -62,6 +62,7 @@ public:
   const_iterator begin() const
   {
     reset();
+    move_next();
     return const_iterator(this);
   }
   const_iterator end() const
