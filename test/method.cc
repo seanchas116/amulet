@@ -4,7 +4,8 @@
 #include <vector>
 #include <initializer_list>
 
-AMULET_METHOD2(sliced, size_t, start, size_t, length,
+AMULET_METHOD(sliced, sliced,
+  (2, ((size_t, start), (size_t, length))),
   template <typename T>
   T apply_(T &self) {
     T ret(length);
@@ -13,21 +14,23 @@ AMULET_METHOD2(sliced, size_t, start, size_t, length,
   }
 )
 
-AMULET_METHOD1(at, size_t, index,
+AMULET_METHOD(at, at,
+  (1, ((size_t, index))),
   template <typename T>
   auto apply_(T &self) {
     return self.at(index);
   }
 )
 
-AMULET_METHOD0(size,
+AMULET_METHOD(size, size,
+  (0, ()),
   template <typename T>
   auto apply_(T &self) {
     return self.size();
   }
 )
 
-AMULET_METHOD_TEMPLATE(apply,
+AMULET_METHOD_TEMPLATE(apply,apply,
   (1, ((typename, TUnaryFunc))),
   (1, ((TUnaryFunc, f))),
   template <typename T>

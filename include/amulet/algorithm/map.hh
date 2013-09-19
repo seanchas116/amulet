@@ -43,7 +43,7 @@ auto make_map_enumerator(TSourceEnumerator &&source, TProc proc)
 }
 
 AMULET_METHOD_TEMPLATE(
-  map,
+  map, map,
   (1, ((typename, TUnaryFunc))),
   (1, ((TUnaryFunc, f))),
   template <typename T>
