@@ -86,7 +86,7 @@ namespace Amulet
     template <typename T>
     auto apply_(T &&range)
     {
-      using iter = WithIndexIterator<typename std::remove_reference<T>::type>;
+      using iter = detail::WithIndexIterator<typename std::remove_reference<T>::type>;
       return boost::make_iterator_range(
         iter(boost::begin(range)),
         iter(boost::end(range)));
