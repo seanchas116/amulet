@@ -1,0 +1,17 @@
+
+# map
+# filter
+# keys
+# values
+# with_index
+each
+each_pair
+each_with_index
+product
+drop
+drop_if
+take
+take_if
+flatten
+flat_map
+zip
