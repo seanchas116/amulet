@@ -64,7 +64,7 @@
       AMULET_METHOD_ARG_LIST(TEMPLATE_ARG_ARRAY) \
     > \
     auto operator|( \
-      T &self, \
+      T &&self, \
       UNIQUE_NAME##_args AMULET_METHOD_TEMPLATE_PASS(TEMPLATE_ARG_ARRAY) &&args \
     ) { \
       return args.apply_(self); \
