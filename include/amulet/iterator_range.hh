@@ -1,9 +1,15 @@
 #pragma once
 
+#include <boost/range/algorithm/equal.hpp>
+#include <boost/range/algorithm/lexicographical_compare.hpp>
+#include <boost/operators.hpp>
+
 namespace Amulet {
 
   template <typename TIterator>
-  class IteratorRange
+  class IteratorRange :
+    private boost::less_than_comparable<IteratorRange<TIterator>>,
+    private boost::equality_comparable<IteratorRange<TIterator>>
   {
   public:
 
@@ -59,6 +65,18 @@ namespace Amulet {
     bool empty() const
     {
       return size() == 0;
+    }
+
+    template <typename TRange>
+    bool operator<(const TRange &other) const
+    {
+      return boost::lexicographical_compare(*this, other);
+    }
+
+    template <typename TRange>
+    bool operator==(const TRange &other) const
+    {
+      return boost::equal(*this, other);
     }
 
   private:

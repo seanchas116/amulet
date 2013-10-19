@@ -10,11 +10,16 @@
 namespace Amulet {
 
   namespace detail {
-    template <typename TPair, typename TBinaryProc>
-    inline void forwardPair(const TPair &pair, TBinaryProc proc)
-    {
-      proc(pair.first, pair.second);
-    }
+
+    template <typename TBinaryProc>
+    struct PairForwarder{
+      TBinaryProc proc;
+      template <typename TPair>
+      void operator()(const TPair &p)
+      {
+        proc(p.first, p.second);
+      }
+    };
   }
   
   template <typename TBase>
@@ -46,7 +51,8 @@ namespace Amulet {
     template <typename TBinaryProc>
     void eachPair(TBinaryProc proc) const
     {
-      each(std::bind(&detail::forwardPair, std::placeholders::_1, proc));
+      detail::PairForwarder<TBinaryProc> f = {proc};
+      each(f);
     }
     
     template <typename TBinaryProc>
@@ -79,8 +85,8 @@ namespace Amulet {
     auto withIndex() const
     {
       return makeIteratorRange(
-        WithIndexIterator<self_type>(this->begin()),
-        WithIndexIterator<self_type>(this->end())
+        makeWithIndexIterator(this->begin()),
+        makeWithIndexIterator(this->end())
       );
     }
 
@@ -92,17 +98,17 @@ namespace Amulet {
     auto tail() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
-      return makeIteratorRange(this->begin() + 1, this->end());
+      return makeIteratorRange(++this->begin(), this->end());
     }
     auto init() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
-      return makeIteratorRange(this->begin(), this->end() - 1);
+      return makeIteratorRange(this->begin(), --this->end());
     }
     auto last() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
-      return *(this->end() - 1);
+      return *(--this->end());
     }
     auto slice(size_type first_index, size_type last_index) const
     {

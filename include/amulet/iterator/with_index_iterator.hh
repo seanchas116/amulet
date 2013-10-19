@@ -12,32 +12,31 @@ namespace Amulet {
 
   namespace detail {
 
-    template <class TRange>
+    template <class TIterator>
     struct WithIndexIteratorBase
     {
     private:
-      using range_iterator = typename boost::range_iterator<TRange>::type;
-      using range_value = typename boost::range_value<TRange>::type;
-      using range_difference = typename boost::range_difference<TRange>::type;
-      using value_type = std::pair<range_value, range_difference>;
+      using traits = std::iterator_traits<TIterator>;
+      using value_type = std::pair<std::size_t, typename traits::value_type>;
     public:
       using type = boost::iterator_adaptor<
-        WithIndexIterator<TRange>,
-        range_iterator,
+        WithIndexIterator<TIterator>,
+        TIterator,
         value_type,
         boost::use_default,
         value_type,
-        range_difference>;
+        boost::use_default
+      >;
     };
 
   }
 
-  template <class TRange>
+  template <class TIterator>
   class WithIndexIterator : 
-    public detail::WithIndexIteratorBase<TRange>::type
+    public detail::WithIndexIteratorBase<TIterator>::type
   {
   private:
-    using base = typename detail::WithIndexIteratorBase<TRange>::type;
+    using base = typename detail::WithIndexIteratorBase<TIterator>::type;
 
   public:
     WithIndexIterator()
@@ -53,7 +52,7 @@ namespace Amulet {
 
     typename base::reference dereference() const
     {
-      return std::make_pair(*this->base_reference(), m_index);
+      return std::make_pair(m_index, *this->base_reference());
     }
 
     void increment()
@@ -78,4 +77,10 @@ namespace Amulet {
     
     typename base::difference_type m_index;
   };
+
+  template <typename TIterator>
+  auto makeWithIndexIterator(TIterator i)
+  {
+    return WithIndexIterator<TIterator>(i);
+  }
 }
