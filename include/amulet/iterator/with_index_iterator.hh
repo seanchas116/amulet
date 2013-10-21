@@ -1,8 +1,6 @@
 #pragma once
 
-#include <boost/range/iterator_range.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
-#include <boost/range/value_type.hpp>
 #include <type_traits>
 
 namespace Amulet {
@@ -79,7 +77,7 @@ namespace Amulet {
   };
 
   template <typename TIterator>
-  auto makeWithIndexIterator(TIterator i)
+  WithIndexIterator<TIterator> makeWithIndexIterator(TIterator i)
   {
     return WithIndexIterator<TIterator>(i);
   }

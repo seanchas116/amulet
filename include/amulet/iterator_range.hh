@@ -28,19 +28,19 @@ namespace Amulet {
     {
     }
 
-    auto begin() const
+    const_iterator begin() const
     {
       return mBegin;
     }
-    auto end() const
+    const_iterator end() const
     {
       return mEnd;
     }
-    auto cbegin() const
+    const_iterator cbegin() const
     {
       return begin();
     }
-    auto cend() const
+    const_iterator cend() const
     {
       return end();
     }
@@ -49,17 +49,22 @@ namespace Amulet {
     {
       if (pos >= size())
         throw std::out_of_range("Amulet::IteratorRange");
-      return *(mBegin + pos);
+      auto i = mBegin;
+      std::advance(i, pos);
+      return i;
     }
 
     const_reference operator[](size_type pos) const
     {
-      return *(mBegin + pos);
+      BOOST_ASSERT(pos < size());
+      auto i = mBegin;
+      std::advance(i, pos);
+      return i;
     }
 
     size_type size() const
     {
-      return mEnd - mBegin;
+      return std::distance(mBegin, mEnd);
     }
 
     bool empty() const

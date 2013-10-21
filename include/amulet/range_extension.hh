@@ -1,11 +1,12 @@
 #pragma once
 
+#include "iterator/with_index_iterator.hh"
+#include "iterator/flatten_iterator.hh"
+#include "iterator_range.hh"
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
-#include "iterator/with_index_iterator.hh"
-#include "iterator_range.hh"
 
 namespace Amulet {
 
@@ -21,6 +22,12 @@ namespace Amulet {
       }
     };
   }
+
+  template <typename TBase>
+  class RangeExtension;
+
+  template <typename TIterator>
+  using ExtendedIteratorRange = RangeExtension<IteratorRange<TIterator>>;
   
   template <typename TBase>
   class RangeExtension : public TBase
@@ -31,11 +38,16 @@ namespace Amulet {
     using self_type = RangeExtension<TBase>;
     using size_type = typename base_type::size_type;
     using difference_type = typename base_type::difference_type;
+    
+    using Value = typename base_type::value_type;
+    using Iterator = typename base_type::const_iterator;
+    using Reference = typename base_type::const_reference;
+    using SubRange = ExtendedIteratorRange<typename base_type::const_iterator>;
 
     template <typename TIterator>
-    static auto makeIteratorRange(TIterator begin, TIterator end)
+    static ExtendedIteratorRange<TIterator> makeIteratorRange(TIterator begin, TIterator end)
     {
-      return RangeExtension<IteratorRange<TIterator>>(begin, end);
+      return ExtendedIteratorRange<TIterator>(begin, end);
     }
 
   public:
@@ -51,7 +63,7 @@ namespace Amulet {
     template <typename TBinaryProc>
     void eachPair(TBinaryProc proc) const
     {
-      detail::PairForwarder<TBinaryProc> f = {proc};
+      detail::PairForwarder<TBinaryProc> f = {std::move(proc)};
       each(f);
     }
     
@@ -62,7 +74,8 @@ namespace Amulet {
     }
     
     template <typename TPred>
-    auto filter(TPred f) const
+    ExtendedIteratorRange<boost::filter_iterator<TPred, Iterator>>
+    filter(TPred f) const
     {
       return makeIteratorRange(
         boost::make_filter_iterator(f, this->begin(), this->end()),
@@ -71,18 +84,44 @@ namespace Amulet {
     }
     
     template <typename TUnaryFunc>
-    auto map(TUnaryFunc f) const
+    ExtendedIteratorRange<boost::transform_iterator<TUnaryFunc, Iterator>>
+    map(TUnaryFunc f) const
     {
       return makeIteratorRange(
         boost::make_transform_iterator(this->begin(), f),
         boost::make_transform_iterator(this->end(), f)
       );
     }
+    
+    ExtendedIteratorRange<FlattenIterator<Iterator>>
+    flatten() const
+    {
+      return makeIteratorRange(
+        makeFlattenIterator(this->end(), this->begin()),
+        makeFlattenIterator(this->end(), this->end())
+      );
+    }
 
     template <typename TUnaryFunc>
-    auto flatMap(TUnaryFunc f) const;
+    ExtendedIteratorRange<
+      FlattenIterator<boost::transform_iterator<TUnaryFunc, Iterator>>
+    >
+    flatMap(TUnaryFunc f) const
+    {
+      return map(f).flatten();
+    }
 
-    auto withIndex() const
+    ExtendedIteratorRange<std::reverse_iterator<Iterator>>
+    reverse() const
+    {
+      return makeIteratorRange(
+        std::reverse_iterator<Iterator>(this->end()),
+        std::reverse_iterator<Iterator>(this->begin())
+      );
+    }
+
+    ExtendedIteratorRange<WithIndexIterator<Iterator>>
+    withIndex() const
     {
       return makeIteratorRange(
         makeWithIndexIterator(this->begin()),
@@ -90,31 +129,31 @@ namespace Amulet {
       );
     }
 
-    auto head() const
+    Reference head() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return *this->begin();
     }
-    auto tail() const
+    SubRange tail() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return makeIteratorRange(++this->begin(), this->end());
     }
-    auto init() const
+    SubRange init() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return makeIteratorRange(this->begin(), --this->end());
     }
-    auto last() const
+    Reference last() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return *(--this->end());
     }
-    auto slice(size_type first_index, size_type last_index) const
+    SubRange slice(size_type first_index, size_type last_index) const
     {
       return mid(first_index, last_index - first_index + 1);
     }
-    auto mid(size_type first_index, size_type size) const
+    SubRange mid(size_type first_index, size_type size) const
     {
       BOOST_ASSERT(this->end() - this->begin() >= first_index + size);
       auto begin_it = this->begin() + first_index;
@@ -122,18 +161,29 @@ namespace Amulet {
       return makeIteratorRange(begin_it, end_it);
     }
 
+    template <template <typename> class TContainer>
+    TContainer<Value> to() const
+    {
+      TContainer<Value> container;
+      //container.reserve(this->size());
+      each([&](const Value &value){
+        container.push_back(value);
+      });
+      return container;
+    }
+
   private:
 
   };
 
   template <typename TIterator>
-  auto extend(TIterator begin, TIterator end)
+  ExtendedIteratorRange<TIterator> extend(TIterator begin, TIterator end)
   {
     return RangeExtension<IteratorRange<TIterator>>(begin, end);
   }
 
   template <typename TRange>
-  auto extend(const TRange &range)
+  ExtendedIteratorRange<typename TRange::const_iterator> extend(const TRange &range)
   {
     return extend(std::begin(range), std::end(range));
   }

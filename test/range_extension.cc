@@ -43,7 +43,7 @@ TEST(RangeExtension, filter)
   auto filtered = xs.filter([](int x){
     return x % 2 == 0;
   });
-  auto expected = {4, 6};
+  ExVector<int> expected = {4, 6};
   EXPECT_EQ(filtered, expected);
 }
 
@@ -55,6 +55,45 @@ TEST(RangeExtension, map)
   });
   auto expected = {0.5, 1.0, 1.5};
   EXPECT_EQ(mapped, expected);
+}
+
+TEST(RangeExtension, flatten)
+{
+  ExVector<ExVector<int>> xs = {{1,2,3},{4,5,6},{7,8,9}};
+  auto flattened = xs.flatten();
+  EXPECT_EQ(9, flattened.size());
+  auto expected = {1,2,3,4,5,6,7,8,9};
+  bool eq = std::equal(flattened.begin(), flattened.end(), expected.begin());
+  EXPECT_EQ(eq, true);
+}
+
+TEST(RangeExtension, flatten_reverse)
+{
+  ExVector<ExVector<int>> xs = {{1,2,3},{4,5,6},{7,8,9}};
+  auto flattened = xs.flatten().reverse();
+  auto expected = {9,8,7,6,5,4,3,2,1};
+  EXPECT_EQ(flattened, expected);
+}
+
+TEST(RangeExtension, flatMap)
+{
+  ExVector<int> xs = {1,2,3};
+  auto flatMapped = xs.flatMap([](int x){
+    return ExVector<int>{x, 2*x, 3*x};
+  });
+  auto expected = {1,2,3,2,4,6,3,6,9};
+  EXPECT_EQ(flatMapped, expected);
+}
+
+TEST(RangeExtension, flatMap_reverse)
+{
+  ExVector<int> xs = {1,2,3};
+  auto flatMapped = xs.flatMap([](int x){
+    return ExVector<int>{x, 2*x, 3*x};
+  }).reverse();
+
+  ExVector<int> expected = {9,6,3,6,4,2,3,2,1};
+  EXPECT_EQ(flatMapped, expected);
 }
 
 TEST(RangeExtension, withIndex)
