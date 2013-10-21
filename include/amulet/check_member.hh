@@ -22,8 +22,13 @@ namespace Amulet {
   {
     template <
       typename T,
-      typename = decltype(&T::template flatMap<int>),
-      typename = decltype(&T::template map<int>)
+      typename = typename T::value_type,
+      typename = decltype(
+        static_cast<const T *>(nullptr)->flatMap(std::function<T(typename T::value_type)>())
+      ),
+      typename = decltype(
+        static_cast<const T *>(nullptr)->map(std::function<typename T::value_type(typename T::value_type)>())
+      )
     >
     static int check();
   };
