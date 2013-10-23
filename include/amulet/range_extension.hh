@@ -73,23 +73,33 @@ namespace Amulet {
       withIndex().eachPair(proc);
     }
     
-    template <typename TPred>
-    ExtendedIteratorRange<boost::filter_iterator<TPred, Iterator>>
-    filter(TPred f) const
+    template <typename TFunc>
+    ExtendedIteratorRange<
+      boost::filter_iterator<
+        std::function<bool(const Value &)>,
+        Iterator>>
+    filter(TFunc f) const
     {
+      using fn = std::function<bool(const Value &)>;
+      using it = boost::filter_iterator<fn, Iterator>;
       return makeIteratorRange(
-        boost::make_filter_iterator(f, this->begin(), this->end()),
-        boost::make_filter_iterator(f, this->end(), this->end())
+        it(f, this->begin(), this->end()),
+        it(f, this->end(), this->end())
       );
     }
     
-    template <typename TUnaryFunc>
-    ExtendedIteratorRange<boost::transform_iterator<TUnaryFunc, Iterator>>
-    map(TUnaryFunc f) const
+    template <typename TFunc>
+    ExtendedIteratorRange<
+      boost::transform_iterator<
+        std::function<typename std::result_of<TFunc(const Value &)>::type(const Value &)>,
+        Iterator>>
+    map(TFunc f) const
     {
+      using fn = std::function<typename std::result_of<TFunc(const Value &)>::type(const Value &)>;
+      using it = boost::transform_iterator<fn, Iterator>;
       return makeIteratorRange(
-        boost::make_transform_iterator(this->begin(), f),
-        boost::make_transform_iterator(this->end(), f)
+        it(this->begin(), f),
+        it(this->end(), f)
       );
     }
     
@@ -102,11 +112,8 @@ namespace Amulet {
       );
     }
 
-    template <typename TUnaryFunc>
-    ExtendedIteratorRange<
-      FlattenIterator<boost::transform_iterator<TUnaryFunc, Iterator>>
-    >
-    flatMap(TUnaryFunc f) const
+    template <typename TFunc>
+    auto flatMap(TFunc f) const -> decltype(static_cast<const RangeExtension *>(nullptr)->map(f).flatten())
     {
       return map(f).flatten();
     }

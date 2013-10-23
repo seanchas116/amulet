@@ -131,6 +131,17 @@ namespace Amulet {
       }
     }
 
+    FlattenIterator &operator=(const FlattenIterator &other)
+    {
+      this->base_reference() = other.base();
+      mBaseEnd = other.mBaseEnd;
+      if (this->base() != mBaseEnd) {
+        mValue = other.mValue;
+        mIt = std::begin(mValue) + std::distance(std::begin(other.mValue), other.mIt);
+      }
+      return *this;
+    }
+
     typename indirect_base::type::reference dereference() const
     {
       return *mIt;

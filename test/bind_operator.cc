@@ -19,3 +19,16 @@ TEST(BindOperator, test)
   EXPECT_EQ(flatMapped, expected_f);
   EXPECT_EQ(mapped, expected_m);
 }
+
+TEST(BindOperator, comprehension)
+{
+  ExVector<int> xs = {1,2,3};
+  ExVector<int> ys = {4,5,6};
+  auto result = xs.flatMap([&ys](int x){
+    return ys.map([x](int y) {
+      return x * y;
+    });
+  });
+  auto expected = { 4, 5, 6, 8, 10, 12, 12, 15, 18 };
+  EXPECT_EQ(result, expected);
+}
