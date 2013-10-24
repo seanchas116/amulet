@@ -37,6 +37,18 @@ TEST(RangeExtension, eachWithIndex)
   EXPECT_EQ(result, expected);
 }
 
+TEST(RangeExtension, min)
+{
+  ExVector<int> xs = {2,4,1,2};
+  EXPECT_EQ(1, xs.min());
+}
+
+TEST(RangeExtension, max)
+{
+  ExVector<int> xs = {2,4,1,2};
+  EXPECT_EQ(4, xs.max());
+}
+
 TEST(RangeExtension, filter)
 {
   ExVector<int> xs = {1,4,6,3};

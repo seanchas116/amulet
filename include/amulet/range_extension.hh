@@ -72,6 +72,40 @@ namespace Amulet {
     {
       withIndex().eachPair(proc);
     }
+
+    template <typename TResult, typename TBinaryFunc>
+    TResult foldLeft(const TResult &init, TBinaryFunc f) const
+    {
+      auto memo = init;
+      each([&](const Value &v){
+        memo = f(memo, v);
+      });
+      return memo;
+    }
+
+    template <typename TResult, typename TBinaryFunc>
+    TResult foldRight(const TResult &init, TBinaryFunc f) const
+    {
+      return reverse().folrLeft(init, f);
+    }
+
+    Value min() const
+    {
+      return tail().foldLeft(head(), [](const Value &m, const Value &v){
+        return std::min(m, v);
+      });
+    }
+
+    Value max() const
+    {
+      return tail().foldLeft(head(), [](const Value &m, const Value &v){
+        return std::max(m, v);
+      });
+    }
+
+    // find
+    // contains
+    // zip
     
     template <typename TFunc>
     ExtendedIteratorRange<
