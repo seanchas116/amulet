@@ -11,15 +11,17 @@ namespace Amulet
       IntIterator<T>,
       T,
       boost::random_access_traversal_tag,
-      T
-    >
+      T>
   {
   public:
+
     IntIterator()
     {}
+
     IntIterator(T value) :
       mValue(value)
     {}
+
   private:
 
     friend class boost::iterator_core_access;
@@ -56,5 +58,11 @@ namespace Amulet
 
     T mValue;
   };
+
+  template <typename T>
+  inline IntIterator<T> makeIntIterator(T value)
+  {
+    return IntIterator<T>(value);
+  }
 
 }

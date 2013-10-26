@@ -1,3 +1,4 @@
+#define _GLIBCXX_DEBUG
 #include <gtest/gtest.h>
 #include <amulet/range_extension.hh>
 
@@ -114,6 +115,14 @@ TEST(RangeExtension, withIndex)
   auto withIndexed = xs.withIndex();
   std::vector<std::pair<std::size_t, int>> expected = {{0,1},{1,4},{2,6},{3,3}};
   EXPECT_EQ(withIndexed, expected);
+}
+
+TEST(RangeExtension, unique)
+{
+  ExVector<int> xs = {1,3,2,3,1};
+  auto uniqued = xs.unique();
+  auto expected = {1,3,2};
+  EXPECT_EQ(uniqued, expected);
 }
 
 TEST(RangeExtension, head_tail_init_last)

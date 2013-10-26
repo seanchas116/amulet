@@ -2,6 +2,7 @@
 
 #include "iterator/with_index_iterator.hh"
 #include "iterator/flatten_iterator.hh"
+#include "iterator/unique_iterator.hh"
 #include "iterator_range.hh"
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/filter_iterator.hpp>
@@ -167,6 +168,15 @@ namespace Amulet {
       return makeIteratorRange(
         makeWithIndexIterator(this->begin()),
         makeWithIndexIterator(this->end())
+      );
+    }
+
+    ExtendedIteratorRange<UniqueIterator<Iterator>>
+    unique() const
+    {
+      return makeIteratorRange(
+        makeUniqueIterator(this->begin(), this->end(), this->begin()),
+        makeUniqueIterator(this->begin(), this->end(), this->end())
       );
     }
 
