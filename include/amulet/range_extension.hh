@@ -211,7 +211,7 @@ namespace Amulet {
       auto end_it = begin_it + size;
       return makeIteratorRange(begin_it, end_it);
     }
-
+    
     template <template <typename> class TContainer>
     TContainer<Value> to() const
     {

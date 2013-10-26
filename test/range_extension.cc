@@ -1,6 +1,8 @@
 #define _GLIBCXX_DEBUG
 #include <gtest/gtest.h>
 #include <amulet/range_extension.hh>
+#include <deque>
+#include <list>
 
 template <typename T>
 using ExVector = Amulet::RangeExtension<std::vector<T>>;
@@ -123,6 +125,25 @@ TEST(RangeExtension, unique)
   auto uniqued = xs.unique();
   auto expected = {1,3,2};
   EXPECT_EQ(uniqued, expected);
+}
+
+TEST(RangeExtension, unique_reverse)
+{
+  ExVector<int> xs = {1,3,2,3,1};
+  auto uniqued = xs.unique().reverse();
+  auto expected = {2,3,1};
+  EXPECT_EQ(uniqued, expected);
+}
+
+TEST(RangeExtension, to)
+{
+  ExVector<int> xs = {1,3,2};
+  auto list = xs.to<std::list<int>>();
+  auto deque = xs.to<std::deque<int>>();
+  auto expected_list = std::list<int>{1,3,2};
+  auto expected_deque = std::deque<int>{1,3,2};
+  EXPECT_EQ(expected_list, list);
+  EXPECT_EQ(expected_deque, deque);
 }
 
 TEST(RangeExtension, head_tail_init_last)
