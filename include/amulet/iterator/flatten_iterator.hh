@@ -4,6 +4,7 @@
 #include <boost/concept/assert.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/assert.hpp>
+#include <type_traits>
 
 namespace Amulet {
 
@@ -26,12 +27,12 @@ namespace Amulet {
         value_type,
         typename std::conditional<
           std::is_convertible<
-            typename boost::iterator_traversal<TBaseIterator>::type,
+            typename boost::iterator_traversal<TIterator>::type,
             boost::bidirectional_traversal_tag
           >::value,
           boost::bidirectional_traversal_tag,
           boost::use_default
-        >::type
+        >::type,
         value_type,
         boost::use_default
       >;
