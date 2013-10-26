@@ -14,11 +14,11 @@ TEST(ComprehensionMacro, test)
   auto b = Amulet::some(1);
 
   auto r1 = AMULET_DO(
-    AMULET_FROM(int x, b),
-    AMULET_FROM(int y, a),
-    divide(x, y)
+    AMULET_FROM(x, b),
+    AMULET_FROM(y, a),
+    AMULET_LET(z, 10),
+    divide(y + z, x)
   );
-
-  EXPECT_EQ(false, r1.hasValue());
-
+  
+  EXPECT_EQ(10, r1.get());
 }

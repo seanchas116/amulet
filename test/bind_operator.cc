@@ -82,4 +82,6 @@ TEST(BindOperator, macro)
     from(int x, b,
     from(int y, a,
     divide(x, y)));
+
+  EXPECT_EQ(false, r1.hasValue());
 }

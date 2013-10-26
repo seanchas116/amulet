@@ -4,7 +4,6 @@
 
 #include "bind_operator.hh"
 #include <boost/preprocessor.hpp>
-#include <boost/preprocessor/variadic/to_list.hpp>
 
 #define AMULET_FROM_INDEX 1
 #define AMULET_LET_INDEX 2
@@ -19,10 +18,10 @@
 #define AMULET_DO_FOLDER(d, tail, head) \
   BOOST_PP_IF( \
     BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(3,0,head), AMULET_FROM_INDEX), \
-    (BOOST_PP_TUPLE_ELEM(3,2,head) >>= [=](BOOST_PP_TUPLE_ELEM(3,1,head)) { return tail; }),\
+    (BOOST_PP_TUPLE_ELEM(3,2,head) >>= [=](decltype(BOOST_PP_TUPLE_ELEM(3,2,head))::value_type BOOST_PP_TUPLE_ELEM(3,1,head)) { return tail; }),\
     BOOST_PP_IF( \
       BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(3,0,head), AMULET_LET_INDEX), \
-      [=](BOOST_PP_TUPLE_ELEM(3,1,head)){ return tail; }(BOOST_PP_TUPLE_ELEM(3,2,head)), \
+      [=](decltype(BOOST_PP_TUPLE_ELEM(3,2,head)) BOOST_PP_TUPLE_ELEM(3,1,head)){ return tail; }(BOOST_PP_TUPLE_ELEM(3,2,head)), \
     ) \
   )
 
