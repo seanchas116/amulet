@@ -64,3 +64,22 @@ TEST(BindOperator, option)
   EXPECT_EQ(false, r1.hasValue());
   EXPECT_EQ(0, r2.get());
 }
+
+#define from(ELEM, MONAD, EXPR) (MONAD >>= [=](ELEM){ return EXPR; })
+
+TEST(BindOperator, macro)
+{
+  auto divide = [](int x, int y) -> Amulet::Option<int>{
+    if (y)
+      return Amulet::some(x / y);
+    else
+      return Amulet::none;
+  };
+  auto a = Amulet::some(0);
+  auto b = Amulet::some(1);
+
+  auto r1 =
+    from(int x, b,
+    from(int y, a,
+    divide(x, y)));
+}
