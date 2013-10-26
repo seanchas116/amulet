@@ -77,7 +77,7 @@ namespace Amulet {
   };
 
   template <typename TIterator>
-  WithIndexIterator<TIterator> makeWithIndexIterator(TIterator i)
+  inline WithIndexIterator<TIterator> makeWithIndexIterator(TIterator i)
   {
     return WithIndexIterator<TIterator>(i);
   }

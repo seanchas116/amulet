@@ -24,7 +24,14 @@ namespace Amulet {
         FlattenIterator<TIterator>,
         TIterator,
         value_type,
-        boost::bidirectional_traversal_tag,
+        typename std::conditional<
+          std::is_convertible<
+            typename boost::iterator_traversal<TBaseIterator>::type,
+            boost::bidirectional_traversal_tag
+          >::value,
+          boost::bidirectional_traversal_tag,
+          boost::use_default
+        >::type
         value_type,
         boost::use_default
       >;
@@ -186,7 +193,7 @@ namespace Amulet {
   };
 
   template <typename TIterator>
-  FlattenIterator<TIterator> makeFlattenIterator(TIterator end, TIterator i)
+  inline FlattenIterator<TIterator> makeFlattenIterator(TIterator end, TIterator i)
   {
     return FlattenIterator<TIterator>(end, i);
   }
