@@ -106,7 +106,6 @@ namespace Amulet {
   class FlattenIterator :
     public detail::FlattenIteratorBase<TIterator>::type
   {
-  private:
     using indirect_base = typename detail::FlattenIteratorBase<TIterator>;
 
   public:
@@ -150,6 +149,10 @@ namespace Amulet {
       return *this;
     }
 
+  private:
+
+    friend class boost::iterator_core_access;
+
     typename indirect_base::type::reference dereference() const
     {
       return *mIt;
@@ -185,8 +188,6 @@ namespace Amulet {
       else
         return this->base() == other.base() && std::distance(std::begin(mValue), mIt) == std::distance(std::begin(other.mValue), other.mIt);
     }
-
-  private:
 
     TIterator mBaseEnd;
     typename indirect_base::original_value mValue;
