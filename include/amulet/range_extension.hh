@@ -213,6 +213,17 @@ namespace Amulet {
       return container;
     }
 
+    template <typename TContainer>
+    TContainer to() const
+    {
+      TContainer container;
+      //container.reserve(this->size());
+      each([&](const Value &value){
+        container.push_back(value);
+      });
+      return container;
+    }
+
   private:
 
   };
