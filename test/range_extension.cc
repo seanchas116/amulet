@@ -135,6 +135,14 @@ TEST(RangeExtension, unique_reverse)
   EXPECT_EQ(uniqued, expected);
 }
 
+TEST(RangeExtension, sort)
+{
+  ExVector<int> xs = {1,3,2,3,1};
+  auto sorted = xs.sort();
+  auto expected = ExVector<int>{1,1,2,3,3};
+  EXPECT_EQ(expected, sorted);
+}
+
 TEST(RangeExtension, to)
 {
   ExVector<int> xs = {1,3,2};

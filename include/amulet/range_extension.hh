@@ -179,6 +179,22 @@ namespace Amulet {
         makeUniqueIterator(this->begin(), this->end(), this->end())
       );
     }
+    
+    RangeExtension<std::vector<Value>>
+    sort() const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::sort(vector.begin(), vector.end());
+      return vector;
+    }
+
+    RangeExtension<std::vector<Value>>
+    stableSort() const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::stable_sort(vector.begin(), vector.end());
+      return vector;
+    }
 
     Reference head() const
     {
