@@ -1,6 +1,13 @@
 #include <gtest/gtest.h>
 #include <amulet/option.hh>
 
+TEST(Option, filter)
+{
+  auto a = Amulet::some(0);
+  auto b = a.filter([](int x){return x == 1;});
+  EXPECT_EQ(false, b.hasValue());
+}
+
 TEST(Option, map)
 {
   auto m = Amulet::some(10).map([](int x){

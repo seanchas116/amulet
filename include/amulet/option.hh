@@ -16,7 +16,7 @@ namespace Amulet {
     using reference = const T &;
     using const_reference = const T &;
 
-    Option() {}
+    Option() = default;
     Option(NoneType) {}
     Option(const T &value) :
       o(value)
@@ -27,6 +27,15 @@ namespace Amulet {
     {
       if (hasValue())
         f(get());
+    }
+
+    template <typename TFunc>
+    Option filter(TFunc f) const
+    {
+      if (hasValue() && f(get()))
+        return *this;
+      else
+        return Option();
     }
 
     template <typename TFunc>
