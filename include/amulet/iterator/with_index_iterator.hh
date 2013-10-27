@@ -37,8 +37,7 @@ namespace Amulet {
     using base = typename detail::WithIndexIteratorBase<TIterator>::type;
 
   public:
-    WithIndexIterator()
-    {}
+    WithIndexIterator() = default;
 
     explicit WithIndexIterator(typename base::base_type i) :
       base(i),

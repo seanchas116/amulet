@@ -15,10 +15,9 @@ namespace Amulet
   {
   public:
 
-    IntIterator()
-    {}
+    IntIterator() = default;
 
-    IntIterator(T value) :
+    explicit IntIterator(T value) :
       mValue(value)
     {}
 

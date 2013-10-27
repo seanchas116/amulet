@@ -6,7 +6,7 @@
 namespace Amulet {
 
   template <typename T>
-  ExtendedIteratorRange<IntIterator<T>> intRange(T first, T last)
+  inline ExtendedIteratorRange<IntIterator<T>> intRange(T first, T last)
   {
     return extend(IntIterator<T>(first), IntIterator<T>(last));
   }

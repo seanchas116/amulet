@@ -109,8 +109,7 @@ namespace Amulet {
     using indirect_base = typename detail::FlattenIteratorBase<TIterator>;
 
   public:
-    FlattenIterator()
-    {}
+    FlattenIterator() = default;
 
     FlattenIterator(TIterator end, TIterator i) :
       indirect_base::type(i),

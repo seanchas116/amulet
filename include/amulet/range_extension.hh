@@ -220,15 +220,6 @@ namespace Amulet {
     using Value = typename base_type::value_type;
     using Iterator = typename base_type::const_iterator;
     using Reference = typename base_type::const_reference;
-    using SubRange = ExtendedIteratorRange<typename base_type::const_iterator>;
-
-    template <typename TIterator>
-    static ExtendedIteratorRange<TIterator> makeIteratorRange(TIterator begin, TIterator end)
-    {
-      return ExtendedIteratorRange<TIterator>(begin, end);
-    }
-
-    
 
   public:
 
@@ -319,24 +310,18 @@ namespace Amulet {
       return ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>(*this);
     }
 
-    ExtendedIteratorRange<WithIndexIterator<Iterator>>
+    ExtendedRangeAdaptor<detail::WithIndexRangePolicy<self_type>>
     withIndex() const
     {
-      return makeIteratorRange(
-        makeWithIndexIterator(this->begin()),
-        makeWithIndexIterator(this->end())
-      );
+      return ExtendedRangeAdaptor<detail::WithIndexRangePolicy<self_type>>(*this);
     }
 
-    ExtendedIteratorRange<UniqueIterator<Iterator>>
+    ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>
     unique() const
     {
-      return makeIteratorRange(
-        makeUniqueIterator(this->begin(), this->end(), this->begin()),
-        makeUniqueIterator(this->begin(), this->end(), this->end())
-      );
+      return ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>(*this);
     }
-    
+
     RangeExtension<std::vector<Value>>
     sort() const
     {
@@ -403,12 +388,7 @@ namespace Amulet {
     template <template <typename> class TContainer>
     TContainer<Value> to() const
     {
-      TContainer<Value> container;
-      //container.reserve(this->size());
-      each([&](const Value &value){
-        container.push_back(value);
-      });
-      return container;
+      return to<TContainer<Value>>();
     }
 
     template <typename TContainer>
@@ -427,13 +407,13 @@ namespace Amulet {
   };
 
   template <typename TIterator>
-  ExtendedIteratorRange<TIterator> extend(TIterator begin, TIterator end)
+  inline ExtendedIteratorRange<TIterator> extend(TIterator begin, TIterator end)
   {
-    return RangeExtension<IteratorRange<TIterator>>(begin, end);
+    return ExtendedIteratorRange<TIterator>(begin, end);
   }
 
   template <typename TRange>
-  ExtendedIteratorRange<typename TRange::const_iterator> extend(const TRange &range)
+  inline ExtendedIteratorRange<typename TRange::const_iterator> extend(const TRange &range)
   {
     return extend(std::begin(range), std::end(range));
   }

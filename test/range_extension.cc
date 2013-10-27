@@ -59,7 +59,7 @@ TEST(RangeExtension, filter)
     return x % 2 == 0;
   });
   ExVector<int> expected = {4, 6};
-  //EXPECT_EQ(filtered, expected);
+  EXPECT_EQ(expected, filtered);
 }
 
 TEST(RangeExtension, map)
@@ -76,10 +76,8 @@ TEST(RangeExtension, flatten)
 {
   ExVector<ExVector<int>> xs = {{1,2,3},{4,5,6},{7,8,9}};
   auto flattened = xs.flatten();
-  EXPECT_EQ(9, flattened.size());
   auto expected = {1,2,3,4,5,6,7,8,9};
-  //bool eq = std::equal(flattened.begin(), flattened.end(), expected.begin());
-  //EXPECT_EQ(eq, true);
+  EXPECT_EQ(expected, flattened);
 }
 
 TEST(RangeExtension, flatten_reverse)

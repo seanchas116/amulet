@@ -36,8 +36,7 @@ namespace Amulet {
 
   public:
 
-    UniqueIterator()
-    {}
+    UniqueIterator() = default;
 
     UniqueIterator(TBaseIterator begin, TBaseIterator end, TBaseIterator i) :
       base_type(i),
