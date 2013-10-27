@@ -5,6 +5,7 @@
 #include "iterator/unique_iterator.hh"
 #include "iterator_range.hh"
 #include "range_adaptor.hh"
+#include "option.hh"
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
@@ -281,9 +282,26 @@ namespace Amulet {
         return std::max(m, v);
       });
     }
+    
+    template <typename TPredicate>
+    Option<Value> find(TPredicate predicate) const
+    {
+      Option<Value> result;
+      for (const Value &x : *this) {
+        if (predicate(x))
+          result = some(x);
+      }
+      return result;
+    }
 
-    // find
-    // contains
+    bool contains(const Value &value) const
+    {
+      for (const Value &x : *this) {
+        if (x == value)
+          return true;
+      }
+      return false;
+    }
     // zip
 
     template <typename TFunc>

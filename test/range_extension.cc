@@ -52,6 +52,28 @@ TEST(RangeExtension, max)
   EXPECT_EQ(4, xs.max());
 }
 
+TEST(RangeExtension, find)
+{
+  ExVector<int> xs = {1,4,5};
+  auto a = xs.find([](int x){
+    return x == 1;
+  });
+  auto b = xs.find([](int x){
+    return x == 0;
+  });
+  EXPECT_EQ(1, a.get());
+  EXPECT_EQ(false, b.hasValue());
+}
+
+TEST(RangeExtension, contains)
+{
+  ExVector<int> xs = {1,2,3};
+  auto a = xs.contains(1);
+  auto b = xs.contains(0);
+  EXPECT_EQ(true, a);
+  EXPECT_EQ(false, b);
+}
+
 TEST(RangeExtension, filter)
 {
   ExVector<int> xs = {1,4,6,3};
