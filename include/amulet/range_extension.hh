@@ -257,6 +257,9 @@ namespace Amulet {
 
   template <typename TPolicy>
   using ExtendedRangeAdaptor = RangeExtension<RangeAdaptor<TPolicy>>;
+
+  template <typename TValue>
+  using UnitRange = RangeExtension<Option<TValue>>;
   
   template <typename TBase>
   class RangeExtension : public TBase
@@ -275,6 +278,11 @@ namespace Amulet {
   public:
 
     using TBase::TBase;
+
+    static UnitRange<Value> fromValue(const Value &value)
+    {
+      return UnitRange<Value>(value);
+    }
 
     template <typename TUnaryProc>
     void each(TUnaryProc proc) const

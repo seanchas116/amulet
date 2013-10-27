@@ -16,11 +16,38 @@ namespace Amulet {
     using reference = const T &;
     using const_reference = const T &;
 
+    using iterator = const value_type *;
+    using const_iterator = iterator;
+
     Option() = default;
     Option(NoneType) {}
     Option(const T &value) :
       o(value)
     {}
+
+    static Option fromValue(const T &value)
+    {
+      return Option(value);
+    }
+
+    const_iterator begin() const
+    {
+      if (hasValue())
+        return &get();
+      else
+        return nullptr;
+    }
+
+    const_iterator end() const
+    {
+      if (hasValue())
+        return &get() + 1;
+      else
+        return nullptr;
+    }
+
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend() const { return end(); }
 
     template <typename TFunc>
     void each(TFunc f) const

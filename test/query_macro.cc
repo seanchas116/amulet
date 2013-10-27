@@ -18,7 +18,7 @@ TEST(QueryMacro, option)
     _from(x, b),
     _from(y, a),
     _let(z, 10),
-    _select(divide(y + z, x))
+    divide(y + z, x)
   );
   
   EXPECT_EQ(10, r1.get());
@@ -35,7 +35,8 @@ TEST(QueryMacro, range)
   auto result1 = _do(
     _from(x, xs),
     _from(y, ys),
-    _select(ExVector<int>{x, y})
+    _where(y == 3),
+    (ExVector<int>{x, y})
   );
   auto result2 = _do(
     _from(x, xs),
@@ -43,7 +44,7 @@ TEST(QueryMacro, range)
     _select(x + y)
   );
   
-  auto expected1 = { 1, 3, 1, 4, 2, 3, 2, 4 };
+  auto expected1 = { 1, 3, 2, 3 };
   auto expected2 = { 4, 5, 5, 6 };
   EXPECT_EQ(expected1, result1);
   EXPECT_EQ(expected2, result2);
