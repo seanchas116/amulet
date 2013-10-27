@@ -134,7 +134,8 @@ namespace Amulet {
     {
       if (this->base() != mBaseEnd) {
         mValue = other.mValue;
-        mIt = std::begin(mValue) + std::distance(std::begin(other.mValue), other.mIt);
+        mIt = std::begin(mValue);
+        std::advance(mIt, std::distance(std::begin(other.mValue), other.mIt));
       }
     }
 
@@ -144,7 +145,8 @@ namespace Amulet {
       mBaseEnd = other.mBaseEnd;
       if (this->base() != mBaseEnd) {
         mValue = other.mValue;
-        mIt = std::begin(mValue) + std::distance(std::begin(other.mValue), other.mIt);
+        mIt = std::begin(mValue);
+        std::advance(mIt, std::distance(std::begin(other.mValue), other.mIt));
       }
       return *this;
     }

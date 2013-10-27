@@ -4,7 +4,7 @@
 #include "iterator/flatten_iterator.hh"
 #include "iterator/unique_iterator.hh"
 #include "iterator_range.hh"
-#include <boost/iterator/transform_iterator.hpp>
+#include "range_adaptor.hh"
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/range/adaptors.hpp>
 #include <boost/range/algorithm.hpp>
@@ -22,6 +22,180 @@ namespace Amulet {
         proc(p.first, p.second);
       }
     };
+
+    template <typename TRange, typename TUnaryFunc>
+    struct MapRangePolicy
+    {
+      using base_range = TRange;
+      using value_type = typename base_range::value_type;
+      using function_result = typename std::result_of<TUnaryFunc(value_type)>::type;
+      using function_type = std::function<function_result(const value_type &)>;
+      using iterator = boost::transform_iterator<function_type, typename base_range::const_iterator>;
+
+      MapRangePolicy() = default;
+      MapRangePolicy(TUnaryFunc f) :
+        mFunc(f)
+      {}
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(std::begin(range), mFunc);
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(std::end(range), mFunc);
+      }
+
+    private:
+      function_type mFunc;
+    };
+
+    template <typename TRange, typename TUnaryFunc>
+    struct FilterRangePolicy
+    {
+      using base_range = TRange;
+      using value_type = typename base_range::value_type;
+      using function_type = std::function<bool(const value_type &)>;
+      using iterator = boost::filter_iterator<function_type, typename base_range::const_iterator>;
+
+      FilterRangePolicy() = default;
+      FilterRangePolicy(TUnaryFunc f) :
+        mFunc(f)
+      {}
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(mFunc, std::begin(range), std::end(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(mFunc, std::end(range), std::end(range));
+      }
+
+    private:
+      function_type mFunc;
+    };
+    
+    template <typename TRange>
+    struct FlattenRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = FlattenIterator<typename base_range::const_iterator>;
+      
+      iterator begin(const base_range &range) const
+      {
+        return iterator(std::end(range), std::begin(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(std::end(range), std::end(range));
+      }
+    };
+
+    template <typename TRange>
+    struct ReverseRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = std::reverse_iterator<typename base_range::const_iterator>;
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(std::end(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(std::begin(range));
+      }
+    };
+
+    template <typename TRange>
+    struct WithIndexRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = WithIndexIterator<typename base_range::const_iterator>;
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(std::begin(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(std::end(range));
+      }
+    };
+
+    template <typename TRange>
+    struct UniqueRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = UniqueIterator<typename base_range::const_iterator>;
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(std::begin(range), std::end(range), std::begin(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(std::begin(range), std::end(range), std::end(range));
+      }
+    };
+
+    template <typename TRange>
+    struct PartialRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = typename base_range::const_iterator;
+
+      PartialRangePolicy() = default;
+      PartialRangePolicy(size_t firstIndex, size_t lastIndex) :
+        mFirstIndex(firstIndex), mLastIndex(lastIndex)
+      {}
+
+      iterator begin(const base_range &range) const
+      {
+        return std::begin(range) + mFirstIndex;
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return std::begin(range) + mLastIndex;
+      }
+
+    private:
+      size_t mFirstIndex = 0, mLastIndex = 0;
+    };
+
+    template <typename TRange>
+    struct NarrowedRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = typename base_range::const_iterator;
+
+      NarrowedRangePolicy() = default;
+      NarrowedRangePolicy(size_t frontOffset, size_t backOffset) :
+        mFrontOffset(frontOffset), mBackOffset(backOffset)
+      {}
+
+      iterator begin(const base_range &range) const
+      {
+        return std::begin(range) + mFrontOffset;
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return std::end(range) - mBackOffset;
+      }
+
+    private:
+      size_t mFrontOffset = 0, mBackOffset = 0;
+    };
+
   }
 
   template <typename TBase>
@@ -29,6 +203,9 @@ namespace Amulet {
 
   template <typename TIterator>
   using ExtendedIteratorRange = RangeExtension<IteratorRange<TIterator>>;
+
+  template <typename TPolicy>
+  using ExtendedRangeAdaptor = RangeExtension<RangeAdaptor<TPolicy>>;
   
   template <typename TBase>
   class RangeExtension : public TBase
@@ -37,8 +214,8 @@ namespace Amulet {
 
     using base_type = TBase;
     using self_type = RangeExtension<TBase>;
-    using size_type = typename base_type::size_type;
-    using difference_type = typename base_type::difference_type;
+    using Size = typename base_type::size_type;
+    using Difference = typename base_type::difference_type;
     
     using Value = typename base_type::value_type;
     using Iterator = typename base_type::const_iterator;
@@ -50,6 +227,8 @@ namespace Amulet {
     {
       return ExtendedIteratorRange<TIterator>(begin, end);
     }
+
+    
 
   public:
 
@@ -107,44 +286,25 @@ namespace Amulet {
     // find
     // contains
     // zip
-    
+
     template <typename TFunc>
-    ExtendedIteratorRange<
-      boost::filter_iterator<
-        std::function<bool(const Value &)>,
-        Iterator>>
+    ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>
     filter(TFunc f) const
     {
-      using fn = std::function<bool(const Value &)>;
-      using it = boost::filter_iterator<fn, Iterator>;
-      return makeIteratorRange(
-        it(f, this->begin(), this->end()),
-        it(f, this->end(), this->end())
-      );
+      return ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>(*this, f);
     }
     
     template <typename TFunc>
-    ExtendedIteratorRange<
-      boost::transform_iterator<
-        std::function<typename std::result_of<TFunc(const Value &)>::type(const Value &)>,
-        Iterator>>
+    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>
     map(TFunc f) const
     {
-      using fn = std::function<typename std::result_of<TFunc(const Value &)>::type(const Value &)>;
-      using it = boost::transform_iterator<fn, Iterator>;
-      return makeIteratorRange(
-        it(this->begin(), f),
-        it(this->end(), f)
-      );
+      return ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>(*this, f);
     }
-    
-    ExtendedIteratorRange<FlattenIterator<Iterator>>
+
+    ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>
     flatten() const
     {
-      return makeIteratorRange(
-        makeFlattenIterator(this->end(), this->begin()),
-        makeFlattenIterator(this->end(), this->end())
-      );
+      return ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>(*this);
     }
 
     template <typename TFunc>
@@ -153,13 +313,10 @@ namespace Amulet {
       return map(f).flatten();
     }
 
-    ExtendedIteratorRange<std::reverse_iterator<Iterator>>
+    ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>
     reverse() const
     {
-      return makeIteratorRange(
-        std::reverse_iterator<Iterator>(this->end()),
-        std::reverse_iterator<Iterator>(this->begin())
-      );
+      return ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>(*this);
     }
 
     ExtendedIteratorRange<WithIndexIterator<Iterator>>
@@ -196,38 +353,53 @@ namespace Amulet {
       return vector;
     }
 
+    ExtendedRangeAdaptor<detail::NarrowedRangePolicy<self_type>>
+    narrow(size_t frontOffset, size_t backOffset) const
+    {
+      BOOST_ASSERT(this->end() - this->begin() - backOffset >= frontOffset);
+      return ExtendedRangeAdaptor<detail::NarrowedRangePolicy<self_type>>(*this, frontOffset, backOffset);
+    }
+
     Reference head() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return *this->begin();
     }
-    SubRange tail() const
+
+    auto tail() const -> decltype(narrow(0,0))
     {
-      BOOST_ASSERT(this->end() - this->begin() > 0);
-      return makeIteratorRange(++this->begin(), this->end());
+      return narrow(1, 0);
     }
-    SubRange init() const
+
+    auto init() const -> decltype(narrow(0,0))
     {
-      BOOST_ASSERT(this->end() - this->begin() > 0);
-      return makeIteratorRange(this->begin(), --this->end());
+      return narrow(0, 1);
     }
+
     Reference last() const
     {
       BOOST_ASSERT(this->end() - this->begin() > 0);
       return *(--this->end());
     }
-    SubRange slice(size_type first_index, size_type last_index) const
+
+    ExtendedRangeAdaptor<detail::PartialRangePolicy<self_type>>
+    partial(size_t beginIndex, size_t endIndex) const
     {
-      return mid(first_index, last_index - first_index + 1);
+      BOOST_ASSERT(beginIndex <= endIndex);
+      BOOST_ASSERT(this->end() - this->begin() >= endIndex);
+      return ExtendedRangeAdaptor<detail::PartialRangePolicy<self_type>>(*this, beginIndex, endIndex);
     }
-    SubRange mid(size_type first_index, size_type size) const
+
+    auto slice(size_t firstIndex, size_t lastIndex) const -> decltype(partial(0,0))
     {
-      BOOST_ASSERT(this->end() - this->begin() >= first_index + size);
-      auto begin_it = this->begin() + first_index;
-      auto end_it = begin_it + size;
-      return makeIteratorRange(begin_it, end_it);
+      return partial(firstIndex, lastIndex + 1);
     }
-    
+
+    auto mid(size_t firstIndex, size_t size) const -> decltype(partial(0,0))
+    {
+      return partial(firstIndex, firstIndex + size);
+    }
+
     template <template <typename> class TContainer>
     TContainer<Value> to() const
     {
