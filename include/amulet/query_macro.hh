@@ -10,6 +10,7 @@
 
 #define AMULET_FROM(elemName, monad) (AMULET_FROM_INDEX, elemName, monad)
 #define AMULET_LET(name, expr) (AMULET_LET_INDEX, name, expr)
+#define AMULET_SELECT(...) (__VA_ARGS__)
 
 // if head = (AMULET_FROM_INDEX, x, xs)
 //   (xs >>= [=](x){return tail;})
