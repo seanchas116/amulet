@@ -13,9 +13,9 @@
 #define AMULET_SELECT(...) (__VA_ARGS__)
 
 // if head = (AMULET_FROM_INDEX, x, xs)
-//   (xs >>= [=](x){return tail;})
+//   (xs >>= [=](decltype(xs)::value_type x){return tail;})
 // else if head = (AMULET_LET_INDEX, x, y)
-//   [=](x){return tail;}(y)
+//   [=](decltype(y) x){return tail;}(y)
 #define AMULET_DO_FOLDER(d, tail, head) \
   BOOST_PP_IF( \
     BOOST_PP_EQUAL(BOOST_PP_TUPLE_ELEM(3,0,head), AMULET_FROM_INDEX), \
