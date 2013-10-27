@@ -159,12 +159,16 @@ namespace Amulet {
 
       iterator begin(const base_range &range) const
       {
-        return std::begin(range) + mFirstIndex;
+        auto i = std::begin(range);
+        std::advance(i, mFirstIndex);
+        return i;
       }
 
       iterator end(const base_range &range) const
       {
-        return std::begin(range) + mLastIndex;
+        auto i = std::begin(range);
+        std::advance(i, mLastIndex);
+        return i;
       }
 
     private:
@@ -184,12 +188,16 @@ namespace Amulet {
 
       iterator begin(const base_range &range) const
       {
-        return std::begin(range) + mFrontOffset;
+        auto i = std::begin(range);
+        std::advance(i, mFrontOffset);
+        return i;
       }
 
       iterator end(const base_range &range) const
       {
-        return std::end(range) - mBackOffset;
+        auto i = std::end(range);
+        std::advance(i, -mBackOffset);
+        return i;
       }
 
     private:
