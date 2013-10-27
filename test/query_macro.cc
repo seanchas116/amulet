@@ -31,12 +31,21 @@ TEST(QueryMacro, range)
 {
   auto xs = ExVector<int>{1,2};
   auto ys = ExVector<int>{3,4};
-  auto zs = _do(
+  
+  auto result1 = _do(
     _from(x, xs),
     _from(y, ys),
     _select(ExVector<int>{x, y})
   );
-  auto expected = { 1, 3, 1, 4, 2, 3, 2, 4 };
-  EXPECT_EQ(zs, expected);
-
+  auto result2 = _do(
+    _from(x, xs),
+    _from(y, ys),
+    _select(x + y)
+  );
+  
+  auto expected1 = { 1, 3, 1, 4, 2, 3, 2, 4 };
+  auto expected2 = { 4, 5, 5, 6 };
+  EXPECT_EQ(expected1, result1);
+  EXPECT_EQ(expected2, result2);
 }
+
