@@ -1,5 +1,8 @@
 #pragma once
 
+#include <type_traits>
+#include <functional>
+
 namespace Amulet {
 
   template <typename T, typename Check, typename = void>

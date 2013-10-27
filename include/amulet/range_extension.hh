@@ -25,6 +25,24 @@ namespace Amulet {
       }
     };
 
+    template <typename T>
+    struct ReturnPairFirst
+    {
+      typename T::first_type operator()(const T &p)
+      {
+        return p.first;
+      }
+    };
+
+    template <typename T>
+    struct ReturnPairSecond
+    {
+      typename T::second_type operator()(const T &p)
+      {
+        return p.second;
+      }
+    };
+
     template <typename TRange, typename TUnaryFunc>
     struct MapRangePolicy
     {
@@ -279,9 +297,10 @@ namespace Amulet {
 
     using TBase::TBase;
 
-    static UnitRange<Value> fromValue(const Value &value)
+    template <typename T>
+    static UnitRange<T> fromValue(const T &value)
     {
-      return UnitRange<Value>(value);
+      return UnitRange<T>(value);
     }
 
     template <typename TUnaryProc>
@@ -402,6 +421,28 @@ namespace Amulet {
     unique() const
     {
       return ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>(*this);
+    }
+
+    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairFirst<Value>>>
+    firsts() const
+    {
+      return map(detail::ReturnPairFirst<Value>());
+    }
+
+    auto keys() const -> decltype(firsts())
+    {
+      return firsts();
+    }
+
+    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairSecond<Value>>>
+    seconds() const
+    {
+      return map(detail::ReturnPairSecond<Value>());
+    }
+
+    auto values() const -> decltype(seconds())
+    {
+      return seconds();
     }
 
     RangeExtension<std::vector<Value>>

@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef BOOST_PP_VARIADICS
 #define BOOST_PP_VARIADICS
+#endif
 
 #include "bind_operator.hh"
 #include <boost/preprocessor.hpp>
@@ -53,3 +55,4 @@
 
 #define AMULET_DO(...) \
   AMULET_DO_REVERSED_LIST(BOOST_PP_LIST_REVERSE(BOOST_PP_VARIADIC_TO_LIST(__VA_ARGS__)))
+
