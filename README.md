@@ -1,7 +1,7 @@
 Amulet
 ======
 
-Amulet is a header-only C++ library that provides functional container processing support like in Underscore.js, Ruby or LINQ.
+Amulet is a header-only C++ library that provides some functional programming support (mainly for containers) like in Underscore.js, Ruby or LINQ.
 
 ## Example
 
@@ -20,7 +20,7 @@ auto fruitsPrices2 = prices.filter([](const std::pair<std::string, int> &pair){
   return pair.first != "carrot";
 }).values();
 
-// comprehension like LINQ query expressions
+// comprehension like LINQ query expressions (using macros)
 auto fruitPrices1 = _do(
   _from(pair, prices),
   _where(pair.first != "carrot"),
