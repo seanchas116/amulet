@@ -1,45 +1,21 @@
 #pragma once
 
+#include "range_facade.hh"
+
 namespace Amulet {
-
-  namespace detail {
-
-    template <typename T>
-    struct RangeComparison
-    {
-      template <typename U> friend bool operator==(const T &x, const U &y) { return boost::equal(x, y); }
-      template <typename U> friend bool operator==(const U &x, const T &y) { return y == x; }
-      template <typename U> friend bool operator!=(const T &x, const U &y) { return !(x == y); }
-      template <typename U> friend bool operator!=(const U &x, const T &y) { return !(x == y); }
-
-      template <typename U> friend bool operator<(const T &x, const U &y) { return boost::lexicographical_compare(x, y); }
-      template <typename U> friend bool operator>(const T &x, const U &y) { return y < x; }
-      template <typename U> friend bool operator<=(const T &x, const U &y) { return !(x > y); }
-      template <typename U> friend bool operator>=(const T &x, const U &y) { return !(x < y); }
-
-      template <typename U> friend bool operator<(const U &x, const T &y) { return boost::lexicographical_compare(x, y); }
-      template <typename U> friend bool operator>(const U &x, const T &y) { return y < x; }
-      template <typename U> friend bool operator<=(const U &x, const T &y) { return !(x > y); }
-      template <typename U> friend bool operator>=(const U &x, const T &y) { return !(x < y); }
-    };
-
-  }
 
   template <typename TPolicy>
   class RangeAdaptor :
-    private detail::RangeComparison<RangeAdaptor<TPolicy>>
+    public RangeFacade<RangeAdaptor<TPolicy>, typename TPolicy::iterator>
   {
+    using base_type = RangeFacade<RangeAdaptor<TPolicy>, typename TPolicy::iterator>;
     using base_range = typename TPolicy::base_range;
 
   public:
 
-    using iterator = typename TPolicy::iterator;
-    using const_iterator = iterator;
-    using value_type = typename std::iterator_traits<iterator>::value_type;
-    using reference = typename std::iterator_traits<iterator>::reference;
-    using const_reference = reference;
-    using difference_type = typename std::iterator_traits<iterator>::difference_type;
-    using size_type = typename std::make_unsigned<difference_type>::type;
+    using const_iterator = typename base_type::const_iterator;
+    using const_reference = typename base_type::const_reference;
+    using size_type = typename base_type::size_type;
 
     RangeAdaptor() = default;
 
@@ -57,16 +33,6 @@ namespace Amulet {
     const_iterator end() const
     {
       return mPolicy.end(mRange);
-    }
-
-    const_iterator cbegin() const
-    {
-      return begin();
-    }
-
-    const_iterator cend() const
-    {
-      return end();
     }
 
     const_reference at(size_type pos) const

@@ -163,6 +163,15 @@ TEST(RangeExtension, sort)
   EXPECT_EQ(expected, sorted);
 }
 
+TEST(RangeExtension, zip)
+{
+  ExVector<int> xs = {1,1,2};
+  ExVector<int> ys = {2,3,5};
+  ExVector<std::pair<int, int>> expected = {{1,2},{1,3},{2,5}};
+  auto zipped = xs.zip(ys);
+  EXPECT_EQ(zipped, expected);
+}
+
 TEST(RangeExtension, to)
 {
   ExVector<int> xs = {1,3,2};

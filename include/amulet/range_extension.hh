@@ -3,6 +3,7 @@
 #include "iterator/with_index_iterator.hh"
 #include "iterator/flatten_iterator.hh"
 #include "iterator/unique_iterator.hh"
+#include "iterator/zip_iterator.hh"
 #include "iterator_range.hh"
 #include "range_adaptor.hh"
 #include "option.hh"
@@ -205,6 +206,47 @@ namespace Amulet {
       size_t mFrontOffset = 0, mBackOffset = 0;
     };
 
+    template <typename TRange1, typename TRange2>
+    class ZipRange :
+      public RangeFacade<
+        ZipRange<TRange1, TRange2>,
+        ZipIterator<typename TRange1::const_iterator, typename TRange2::const_iterator>
+      >
+    {
+    public:
+
+      using const_iterator = ZipIterator<typename TRange1::const_iterator, typename TRange2::const_iterator>;
+
+      ZipRange() = default;
+
+      ZipRange(const TRange1 &r1, const TRange2 r2) :
+        mRange1(r1), mRange2(r2)
+      {}
+
+      const_iterator begin() const
+      {
+        return const_iterator(std::begin(mRange1), std::begin(mRange2));
+      }
+
+      const_iterator end() const
+      {
+        ptrdiff_t d1 = std::distance(std::begin(mRange1), std::end(mRange1));
+        ptrdiff_t d2 = std::distance(std::begin(mRange2), std::end(mRange2));
+        auto d = std::min(d1, d2);
+
+        auto i1 = std::begin(mRange1);
+        auto i2 = std::begin(mRange2);
+        std::advance(i1, d);
+        std::advance(i2, d);
+        return const_iterator(i1, i2);
+      }
+
+    private:
+
+      TRange1 mRange1;
+      TRange2 mRange2;
+    };
+
   }
 
   template <typename TBase>
@@ -302,7 +344,13 @@ namespace Amulet {
       }
       return false;
     }
-    // zip
+
+    template <typename TRange>
+    detail::ZipRange<RangeExtension<TBase>, TRange>
+    zip(const TRange &other) const
+    {
+      return detail::ZipRange<RangeExtension<TBase>, TRange>(*this, other);
+    }
 
     template <typename TFunc>
     ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>
