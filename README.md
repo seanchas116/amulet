@@ -4,6 +4,7 @@ Amulet
 Amulet is a header-only C++ library that provides some functional programming support (mainly for containers and monads) like in Underscore.js, Ruby, Scala or LINQ.
 
 - Add convenient functional methods to containers (`Amulet::RangeExtension`)
+  - Lazy (deferred) evaluation of returned containers
 - Comprehension syntax (query macro)
 - Optional values (`Amulet::Option`)
 
@@ -12,7 +13,7 @@ Amulet is a header-only C++ library that provides some functional programming su
 `Amulet::RangeExtension` is a template class that inherits the given container class (which must have `begin()` and `end()` methods)
 and adds a set of convenient methods for container manipulation to the original class.
 
-All methods provided by RangeExtension is immutable (const).
+All methods provided by RangeExtension is immutable (const) and most of the returned containers are lazily evaluated.
 
 ### Some Examples
 
