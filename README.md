@@ -14,8 +14,6 @@ and adds a set of convenient methods for container manipulation to the original 
 
 All methods provided by RangeExtension is immutable (const).
 
-[Reference](##reference)
-
 ### Some Examples
 
 ```cpp
@@ -48,7 +46,7 @@ xs.flatMap([](int x){
 xs.withIndex(); // => {{0,1},{1,2},{2,3}}
 ```
 
-For detail, see `include/amulet/range_extension.hh`.
+For detail, see the reference (at the bottom of this page).
 
 ### Extend existing containers
 
