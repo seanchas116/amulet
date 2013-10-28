@@ -16,7 +16,7 @@ All methods provided by RangeExtension is immutable (const).
 
 ### Some Examples
 
-```
+```cpp
 RangeExtension<std::vector<int>> xs = {1,2,3};
 
 // produce a new container by transforming each value by a function
@@ -127,7 +127,7 @@ While `boost::optional` is analogous to pointers, `Amulet::Option` is analogous 
 
 Since Option is analogous to containers, you can use query macro with Option values.
 
-```
+```cpp
 auto divide = [](int x, int y) -> Amulet::Option<int>{
   if (y)
     return Amulet::some(x / y);  // succeeded
