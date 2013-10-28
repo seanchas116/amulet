@@ -15,14 +15,26 @@ TEST(QueryMacro, option)
   auto a = Amulet::some(0);
   auto b = Amulet::some(1);
 
-  auto r1 = _do(
+  auto divided = _do(
     _from(x, b),
     _from(y, a),
     _let(z, 10),
-    divide(y + z, x)
+    divide(x, y)
+  );
+
+  auto added1 = _do(
+    _from(x, a),
+    _from(y, b),
+    _select(x + y)
+  );
+
+  auto added2 = _do(
+    _from(x, a),
+    _from(y, divided),
+    _select(x + y)
   );
   
-  EXPECT_EQ(10, r1.get());
+  EXPECT_EQ(false, added2.hasValue());
 }
 
 template <typename T>
