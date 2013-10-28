@@ -453,11 +453,29 @@ namespace Amulet {
       return vector;
     }
 
+    template <typename TBinaryFunc>
+    RangeExtension<std::vector<Value>>
+    sortBy(TBinaryFunc compare) const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::sort(vector.begin(), vector.end(), compare);
+      return vector;
+    }
+
     RangeExtension<std::vector<Value>>
     stableSort() const
     {
       auto vector = to<RangeExtension<std::vector<Value>>>();
       std::stable_sort(vector.begin(), vector.end());
+      return vector;
+    }
+
+    template <typename TBinaryFunc>
+    RangeExtension<std::vector<Value>>
+    stableSortBy(TBinaryFunc compare) const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::stable_sort(vector.begin(), vector.end(), compare);
       return vector;
     }
 

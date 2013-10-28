@@ -14,6 +14,8 @@ and adds a set of convenient methods for container manipulation to the original 
 
 All methods provided by RangeExtension is immutable (const).
 
+[Reference](##reference)
+
 ### Some Examples
 
 ```cpp
@@ -169,3 +171,295 @@ In Amulet, Monad concept is defined as followings:
 RangeExtension and Option fulfills this concept.
 
 In fact, query macro can be used with any values which type fulfills Monad concept.
+
+## Reference
+
+### RangeExtension
+
+- `each(function)`
+
+Passes every value in the container to a function.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.each([](int x){
+  std::cout << x << std::endl;
+});
+```
+
+- `eachPair(function)`
+
+Passes every pair in the container to a function.
+Available only if the value type of the container is std::pair or a equivalent one.
+
+```cpp
+RangeExtension<std::map<int, std::string>> xs = {{1, "one"},{2, "two"},{3, "three"}};
+xs.eachPair([](int x, const std::string &str){
+  std::cout << x << ": " << str << std::endl;
+});
+```
+
+- `eachWithIndex(function)`
+
+Passes every value and its index to a function.
+Equivalent to `withIndex().eachPair`
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.eachWithIndex([](size_t index, int x){
+  std::cout << index << ": " << x << std::endl;
+});
+```
+
+- `foldLeft(initialState, function)`
+
+Passes each value and the current state to a function in left-to-right order and sets the current state to the return value.
+
+```
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.foldLeft(0, [](int sum, int x){
+  return sum + x;
+}); // => 6
+```
+
+- `foldRight(initialState, function)`
+
+Passes each value and the current state to a function in right-to-left order and sets the current state to the return value.
+Equivalent to `reverse().foldLeft`
+
+- `min()`
+
+Returns the minimum value.
+
+- `max()`
+
+Returns the maximum value.
+
+- `find(predicate)`
+
+Finds the first value that fulfill the condition.
+Return type is `Option<value_type>`.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.find([](int x){
+  return x % 2 == 0;
+}); // Option<int>(2)
+xs.find([](int x){
+  return x < 0;
+}); // Option<int>() (has no value)
+```
+
+- `contains(value)`
+
+Returns whether the container contains the value.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.contains(1); // => true
+xs.contains(0); // => false
+```
+
+- `zip(otherContainer)`
+
+Merges together each value of the container and another container into a std::pair.
+The size of merged container will be the minimum of the sizes of original ones.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+RangeExtension<std::vector<int>> ys = {4,5,6,7};
+xs.zip(ys); // => {{1,4},{2,5},{3,6}}
+```
+
+- `filter(predicate)`
+
+Collects all values that fulfill a condition.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.filter([](int x){
+  return x % 2 != 0;
+}); // => {1,3}
+```
+
+- `map(function)`
+
+Produces a new container by transforming each value by a function.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.map([](int x){
+  return x * 2;
+}); // => {2,4,6}
+```
+
+- `flatten()`
+
+Flattens a container of containers.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<
+  RangeExtension<std::vector<int>>
+>> xs = {{1,2,3},{4,5,6},{7,8,9}};
+xs.flatten(); // => {1,2,3,4,5,6,7,8,9}
+```
+
+- `flatMap(function)`
+
+Equivalent to `map(function).flatten()`.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.flatMap([](int x){
+  return RangeExtension<std::vector<int>>{x,x};
+}); // => {1,1,2,2,3,3}
+```
+
+- `reverse()`
+
+Makes a reverse container.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.reverse(); // => {3,2,1}
+```
+
+- `withIndex()`
+
+Merges together each index and each value int a std::pair.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3};
+xs.withIndex(); // => {{0,1},{1,2},{2,3}}
+```
+
+- `unique()`
+
+Removes any duplicates.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,2,3,1};
+xs.unique(); // => {1,2,3}
+```
+
+- `firsts(), keys()`
+
+Collects the first value of each pair.
+Available only if the value type of the container is std::pair or a equivalent one.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::map<int, std::string>> xs = {{1, "one"},{2, "two"},{3, "three"}};
+xs.firsts(); // => {1,2,3}
+```
+
+- `seconds(), values()`
+
+Collects the second value of each pair.
+Available only if the value type of the container is std::pair or a equivalent one.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::map<int, std::string>> xs = {{1, "one"},{2, "two"},{3, "three"}};
+xs.seconds(); // => {"one","two","three"}
+```
+
+- `sort(), stableSort()`
+
+Sorts the values.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.sort(); // => {0,1,2,3}
+```
+
+- `sortBy(compare), stableSortBy(compare)`
+
+Sorts the values by a compare function.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.sortBy([](int x, int y){
+  return x > y;
+}); // => {3,2,1,0}
+```
+
+- `partial(beginIndex, endIndex)`
+
+Returns a sliced container from `beginIndex` until `endIndex`.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.partial(1,3) // => {3,2}
+```
+
+- `slice(firstIndex, lastIndex)`
+
+Returns a sliced container from `firstIndex` to `lastIndex`.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.slice(1,3) // => {3,2,0}
+```
+
+- `mid(firstIndex, size)`
+
+Returns a sliced container from `firstIndex` until `firstIndex + size`.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.mid(1,2) // => {3,2}
+```
+
+- `narrow(frontOffset, backOffset)`
+
+Drops the first `frontOffset` values and the last `backOffset` values.
+The result is lazily-evaluated.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+xs.narrow(1,1) // => {3,2}
+```
+
+- `head()`
+
+Returns the first value.
+
+- `tail()`
+
+Drops the first value.
+Equivalent to `narrow(1,0)`.
+
+- `init()`
+
+Drops the last value.
+Equivalent to `narrow(0,1)`.
+
+- `tail()`
+
+Returns the last value.
+
+- `to<NewContainer>()`
+
+Creates a new container and puts all the values into it.
+
+```cpp
+RangeExtension<std::vector<int>> xs = {1,3,2,0};
+auto newVector = xs.map([](int x){
+  return x * 2;
+}).to<std::vector<int>>(); // => std::vector<int>{2,4,6}
+```
+
+### Option
+
