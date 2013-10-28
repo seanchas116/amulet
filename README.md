@@ -10,7 +10,7 @@ Amulet is a header-only C++ library that provides some functional programming su
 ## RangeExtension
 
 `Amulet::RangeExtension` is a template class that inherits the given container class (which must have `begin()` and `end()` methods)
-and adds a set of convenient methods for container processing to the original class.
+and adds a set of convenient methods for container manipulation to the original class.
 
 All methods provided by RangeExtension is immutable (const).
 
