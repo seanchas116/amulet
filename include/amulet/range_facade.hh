@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/range/algorithm/equal.hpp>
+#include <boost/range/algorithm/lexicographical_compare.hpp>
+
 namespace Amulet {
 
   namespace detail {
