@@ -1,6 +1,5 @@
-#define _GLIBCXX_DEBUG
-#include <gtest/gtest.h>
 #include <amulet/range_extension.hh>
+#include <gtest/gtest.h>
 #include <deque>
 #include <list>
 

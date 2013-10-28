@@ -1,4 +1,3 @@
-
 #include <amulet/short_query_macro.hh>
 #include <amulet/range_extension.hh>
 #include <vector>

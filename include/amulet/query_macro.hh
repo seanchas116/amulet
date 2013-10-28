@@ -4,8 +4,8 @@
 #define BOOST_PP_VARIADICS
 #endif
 
-#include "bind_operator.hh"
 #include <boost/preprocessor.hpp>
+#include "bind_operator.hh"
 
 #define AMULET_FROM_INDEX 1
 #define AMULET_LET_INDEX 2

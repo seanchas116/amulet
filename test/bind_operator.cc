@@ -1,7 +1,7 @@
-#include <gtest/gtest.h>
 #include <amulet/range_extension.hh>
 #include <amulet/option.hh>
 #include <amulet/bind_operator.hh>
+#include <gtest/gtest.h>
 
 template <typename T>
 using ExVector = Amulet::RangeExtension<std::vector<T>>;
