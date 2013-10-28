@@ -24,10 +24,11 @@ namespace Amulet {
     Option(const T &value) :
       o(value)
     {}
-
-    static Option fromValue(const T &value)
+    
+    template <typename U>
+    static Option<U> fromValue(const U &value)
     {
-      return Option(value);
+      return Option<U>(value);
     }
 
     const_iterator begin() const
