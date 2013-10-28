@@ -163,6 +163,16 @@ TEST(RangeExtension, sort)
   EXPECT_EQ(expected, sorted);
 }
 
+TEST(RangeExtension, sortBy)
+{
+  ExVector<int> xs = {1,3,2,3,1};
+  auto sorted = xs.sortBy([](int x, int y){
+    return x > y;
+  });
+  auto expected = ExVector<int>{3,3,2,1,1};
+  EXPECT_EQ(expected, sorted);
+}
+
 TEST(RangeExtension, zip)
 {
   ExVector<int> xs = {1,1,2};
