@@ -3,10 +3,14 @@ Amulet
 
 Amulet is a header-only C++ library that provides some functional programming support (mainly for containers) like in Underscore.js, Ruby or LINQ.
 
+- Add convenient functional methods to containers (`Amulet::RangeExtension`)
+- Comprehension syntax (query macro)
+- Optional values (`Amulet::Option`)
+
 ## RangeExtension
 
 `Amulet::RangeExtension` is a template class that inherits the given container class (which must have `begin()` and `end()` methods)
-and adds a set of convinient methods for container processing to the original class.
+and adds a set of convenient methods for container processing to the original class.
 
 All methods provided by RangeExtension is immutable (const).
 
@@ -42,6 +46,8 @@ xs.flatMap([](int x){
 xs.withIndex(); // => {{0,1},{1,2},{2,3}}
 ```
 
+For detail, see `include/amulet/range_extension.hh`.
+
 ### Extend existing containers
 
 `Amulet::extend` wraps a normal container and make RangeExtension methods available.
@@ -53,9 +59,34 @@ auto twices = Amulet.extend(vec).map([](int x){
 });
 ```
 
-## Query Macro
+### Int Range
 
-Amulet provides a comprehension syntax like LINQ qury expressions, for expression in Scala or do notation in Haskell, using preprocessor macro.
+`Amulet::intRange` returns an integer range that has RangeExtension methods.
+
+```cpp
+auto fizzbuzz = Amulet::intRange(0, 100).map([](int x)->std::string{
+  if (x % 15 == 0)
+    return "fizzbuzz";
+  else if (x % 3 == 0)
+    return "fizz";
+  else if (x % 5 == 0)
+    return "buzz";
+  else
+    return std::to_string(x);
+});
+
+std::copy(fizzbuzz.begin(), fizzbuzz.end(), std::ostream_iterator<std::string>(std::cout, " "));
+std::cout << std::endl;
+```
+
+### Weaknesses
+
+For safety and convenience, RangeExtension methods that returns a transformed container (e.g., `map`, `filter`) internally copy the original container.
+
+
+## Query Macro (Comprehension)
+
+Amulet provides a comprehension syntax similar to LINQ qury expressions, for-comrehension in Scala or do-notation in Haskell, using preprocessor macro.
 
 ```cpp
 template <typename T>

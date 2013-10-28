@@ -113,10 +113,10 @@ TEST(RangeExtension, flatten_reverse)
 TEST(RangeExtension, flatMap)
 {
   ExVector<int> xs = {1,2,3};
-  auto flatMapped = xs.flatMap([](int x){
-    return ExVector<int>{x, 2*x, 3*x};
+  auto flatMapped = xs.flatMap([](double x){
+    return ExVector<double>{x, 2*x, 3*x};
   });
-  ExVector<int> expected = {1,2,3,2,4,6,3,6,9};
+  ExVector<double> expected = {1,2,3,2,4,6,3,6,9};
   EXPECT_EQ(flatMapped, expected);
 }
 
