@@ -92,6 +92,15 @@ Amulet provides a comprehension syntax similar to LINQ query expressions, for-co
 template <typename T>
 using ExVector = Amulet::RangeExtension<std::vector<T>>;
 
+auto xs = ExVector<int>{1,2};
+auto ys = ExVector<int>{3,4};
+
+auto product = _do(
+  _from(x, xs),
+  _from(y, ys),
+  _select(std::make_pair(x, y))
+); // => {{1,3},{1,4},{2,3},{2,4}}
+
 ExVector<std::pair<std::string, int>> prices = {
   {"orange", 50},
   {"apple", 100},
@@ -117,6 +126,7 @@ auto fruitsPrices3 = prices.filter([](const std::pair<std::string, int> &pair){
   return pair.first != "carrot";
 }).values();
 ```
+
 
 ## Option
 
