@@ -1,7 +1,7 @@
 Amulet
 ======
 
-Amulet is a header-only C++ library that provides some functional programming support (mainly for containers) like in Underscore.js, Ruby or LINQ.
+Amulet is a header-only C++ library that provides some functional programming support (mainly for containers and monads) like in Underscore.js, Ruby, Scala or LINQ.
 
 - Add convenient functional methods to containers (`Amulet::RangeExtension`)
 - Comprehension syntax (query macro)
@@ -86,7 +86,7 @@ For safety and convenience, RangeExtension methods that returns a transformed co
 
 ## Query Macro (Comprehension)
 
-Amulet provides a comprehension syntax similar to LINQ qury expressions, for-comrehension in Scala or do-notation in Haskell, using preprocessor macro.
+Amulet provides a comprehension syntax similar to LINQ query expressions, for-comrehension in Scala or do-notation in Haskell, using preprocessor macro.
 
 ```cpp
 template <typename T>
