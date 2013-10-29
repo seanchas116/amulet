@@ -132,9 +132,23 @@ namespace Amulet {
       mBaseEnd(other.mBaseEnd)
     {
       if (this->base() != mBaseEnd) {
+        auto distance = std::distance(std::begin(other.mValue), other.mIt);
         mValue = other.mValue;
         mIt = std::begin(mValue);
-        std::advance(mIt, std::distance(std::begin(other.mValue), other.mIt));
+        std::advance(mIt, distance);
+      }
+    }
+
+    FlattenIterator(FlattenIterator &&other) :
+      indirect_base::type(other.base()),
+      mBaseEnd(std::move(other.mBaseEnd))
+    {
+      const auto &constOther = other;
+      if (this->base() != mBaseEnd) {
+        auto distance = std::distance(std::begin(constOther.mValue), other.mIt);
+        mValue = std::move(other.mValue);
+        mIt = std::begin(mValue);
+        std::advance(mIt, distance);
       }
     }
 
@@ -143,9 +157,24 @@ namespace Amulet {
       this->base_reference() = other.base();
       mBaseEnd = other.mBaseEnd;
       if (this->base() != mBaseEnd) {
+        auto distance = std::distance(std::begin(other.mValue), other.mIt);
         mValue = other.mValue;
         mIt = std::begin(mValue);
-        std::advance(mIt, std::distance(std::begin(other.mValue), other.mIt));
+        std::advance(mIt, distance);
+      }
+      return *this;
+    }
+
+    FlattenIterator &operator=(FlattenIterator &&other)
+    {
+      const auto &constOther = other;
+      this->base_reference() = other.base();
+      mBaseEnd = std::move(other.mBaseEnd);
+      if (this->base() != mBaseEnd) {
+        auto distance = std::distance(std::begin(constOther.mValue), other.mIt);
+        mValue = std::move(other.mValue);
+        mIt = std::begin(mValue);
+        std::advance(mIt, distance);
       }
       return *this;
     }
