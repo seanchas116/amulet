@@ -293,6 +293,8 @@ namespace Amulet {
     using Iterator = typename base_type::const_iterator;
     using Reference = typename base_type::const_reference;
 
+    static RangeExtension *dummySelf();
+
   public:
 
     using TBase::TBase;
@@ -372,77 +374,175 @@ namespace Amulet {
       return false;
     }
 
-    template <typename TRange>
-    detail::ZipRange<RangeExtension<TBase>, TRange>
-    zip(const TRange &other) const
-    {
-      return detail::ZipRange<RangeExtension<TBase>, TRange>(*this, other);
-    }
-
-    template <typename TFunc>
-    ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>
-    filter(TFunc f) const
-    {
-      return ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>(*this, f);
-    }
+  private:
     
-    template <typename TFunc>
-    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>
-    map(TFunc f) const
-    {
-      return ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>(*this, f);
-    }
-
-    ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>
-    flatten() const
-    {
-      return ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>(*this);
-    }
+    template <typename TRange>
+    using ZipRangeType = detail::ZipRange<RangeExtension<TBase>, TRange>;
 
     template <typename TFunc>
-    auto flatMap(TFunc f) const -> decltype(static_cast<const RangeExtension *>(nullptr)->map(f).flatten())
+    using FilterRangeType = ExtendedRangeAdaptor<detail::FilterRangePolicy<self_type, TFunc>>;
+
+    template <typename TFunc>
+    using MapRangeType = ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>;
+
+    using FlattenRangeType = ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>;
+    using ReverseRangeType = ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>;
+
+    using WithIndexRangeType = ExtendedRangeAdaptor<detail::WithIndexRangePolicy<self_type>>;
+    using UniqueRangeType = ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>;
+    
+    using FirstsRangeType = ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairFirst<Value>>>;
+    using SecondsRangeType = ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairSecond<Value>>>;
+
+    using NarrowedRangeType = ExtendedRangeAdaptor<detail::NarrowedRangePolicy<self_type>>;
+    using PartialRangeType = ExtendedRangeAdaptor<detail::PartialRangePolicy<self_type>>;
+
+  public:
+
+    template <typename TRangeRef>
+    ZipRangeType<typename std::remove_reference<TRangeRef>::type>
+    zip(TRangeRef &&other) const &
+    {
+      return ZipRangeType<typename std::remove_reference<TRangeRef>::type>(*this, std::forward<TRangeRef>(other));
+    }
+
+    template <typename TRangeRef>
+    ZipRangeType<typename std::remove_reference<TRangeRef>::type>
+    zip(TRangeRef &&other) const &&
+    {
+      return ZipRangeType<typename std::remove_reference<TRangeRef>::type>(std::move(*this), std::forward<TRangeRef>(other));
+    }
+
+    template <typename TFunc>
+    FilterRangeType<TFunc>
+    filter(TFunc f) const &
+    {
+      return FilterRangeType<TFunc>(*this, f);
+    }
+
+    template <typename TFunc>
+    FilterRangeType<TFunc>
+    filter(TFunc f) const &&
+    {
+      return FilterRangeType<TFunc>(std::move(*this), f);
+    }
+
+    template <typename TFunc>
+    MapRangeType<TFunc>
+    map(TFunc f) const &
+    {
+      return MapRangeType<TFunc>(*this, f);
+    }
+
+    template <typename TFunc>
+    MapRangeType<TFunc>
+    map(TFunc f) const &&
+    {
+      return MapRangeType<TFunc>(std::move(*this), f);
+    }
+
+    FlattenRangeType
+    flatten() const &
+    {
+      return FlattenRangeType(*this);
+    }
+
+    FlattenRangeType
+    flatten() const &&
+    {
+      return FlattenRangeType(std::move(*this));
+    }
+
+    template <typename TFunc>
+    auto flatMap(TFunc f) const & -> decltype(dummySelf()->map(f).flatten())
     {
       return map(f).flatten();
     }
 
-    ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>
-    reverse() const
+    template <typename TFunc>
+    auto flatMap(TFunc f) const && -> decltype(dummySelf()->map(f).flatten())
     {
-      return ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>(*this);
+      return std::move(*this).map().flatten();
     }
 
-    ExtendedRangeAdaptor<detail::WithIndexRangePolicy<self_type>>
-    withIndex() const
+    ReverseRangeType 
+    reverse() const &
     {
-      return ExtendedRangeAdaptor<detail::WithIndexRangePolicy<self_type>>(*this);
+      return ReverseRangeType(*this);
     }
 
-    ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>
-    unique() const
+    ReverseRangeType
+    reverse() const &&
     {
-      return ExtendedRangeAdaptor<detail::UniqueRangePolicy<self_type>>(*this);
+      return ReverseRangeType(std::move(*this));
     }
 
-    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairFirst<Value>>>
-    firsts() const
+    WithIndexRangeType
+    withIndex() const &
+    {
+      return WithIndexRangeType(*this);
+    }
+
+    WithIndexRangeType
+    withIndex() const &&
+    {
+      return WithIndexRangeType(std::move(*this));
+    }
+
+    UniqueRangeType
+    unique() const &
+    {
+      return UniqueRangeType(*this);
+    }
+
+    UniqueRangeType
+    unique() const &&
+    {
+      return UniqueRangeType(std::move(*this));
+    }
+
+    FirstsRangeType
+    firsts() const &
     {
       return map(detail::ReturnPairFirst<Value>());
     }
 
-    auto keys() const -> decltype(firsts())
+    FirstsRangeType
+    firsts() const &&
+    {
+      return std::move(*this).map(detail::ReturnPairFirst<Value>());
+    }
+
+    auto keys() const & -> decltype(dummySelf()->firsts())
     {
       return firsts();
     }
-
-    ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, detail::ReturnPairSecond<Value>>>
-    seconds() const
+ 
+    auto keys() const && -> decltype(dummySelf()->firsts())
+    {
+      return std::move(*this).firsts();
+    }
+    
+    SecondsRangeType
+    seconds() const &
     {
       return map(detail::ReturnPairSecond<Value>());
     }
 
-    auto values() const -> decltype(seconds())
+    SecondsRangeType
+    seconds() const &&
+    {
+      return std::move(*this).map(detail::ReturnPairSecond<Value>());
+    }
+
+    auto values() const & -> decltype(dummySelf()->seconds())
     {
       return seconds();
+    }
+
+    auto values() const && -> decltype(dummySelf()->seconds())
+    {
+      return std::move(*this).seconds();
     }
 
     RangeExtension<std::vector<Value>>
@@ -479,11 +579,18 @@ namespace Amulet {
       return vector;
     }
 
-    ExtendedRangeAdaptor<detail::NarrowedRangePolicy<self_type>>
-    narrow(size_t frontOffset, size_t backOffset) const
+    NarrowedRangeType
+    narrow(size_t frontOffset, size_t backOffset) const &
     {
       BOOST_ASSERT(this->end() - this->begin() - backOffset >= frontOffset);
-      return ExtendedRangeAdaptor<detail::NarrowedRangePolicy<self_type>>(*this, frontOffset, backOffset);
+      return NarrowedRangeType(*this, frontOffset, backOffset);
+    }
+
+    NarrowedRangeType
+    narrow(size_t frontOffset, size_t backOffset) const &&
+    {
+      BOOST_ASSERT(this->end() - this->begin() - backOffset >= frontOffset);
+      return NarrowedRangeType(std::move(*this), frontOffset, backOffset);
     }
 
     Reference head() const
@@ -492,14 +599,24 @@ namespace Amulet {
       return *this->begin();
     }
 
-    auto tail() const -> decltype(narrow(0,0))
+    auto tail() const & -> decltype(dummySelf()->narrow(0,0))
     {
       return narrow(1, 0);
     }
 
-    auto init() const -> decltype(narrow(0,0))
+    auto tail() const && -> decltype(dummySelf()->narrow(0,0))
+    {
+      return std::move(*this).narrow(1, 0);
+    }
+
+    auto init() const & -> decltype(dummySelf()->narrow(0,0))
     {
       return narrow(0, 1);
+    }
+
+    auto init() const && -> decltype(dummySelf()->narrow(0,0))
+    {
+      return std::move(*this).narrow(0, 1);
     }
 
     Reference last() const
@@ -508,22 +625,40 @@ namespace Amulet {
       return *(--this->end());
     }
 
-    ExtendedRangeAdaptor<detail::PartialRangePolicy<self_type>>
-    partial(size_t beginIndex, size_t endIndex) const
+    PartialRangeType
+    partial(size_t beginIndex, size_t endIndex) const &
     {
       BOOST_ASSERT(beginIndex <= endIndex);
       BOOST_ASSERT(this->end() - this->begin() >= endIndex);
-      return ExtendedRangeAdaptor<detail::PartialRangePolicy<self_type>>(*this, beginIndex, endIndex);
+      return PartialRangeType(*this, beginIndex, endIndex);
     }
 
-    auto slice(size_t firstIndex, size_t lastIndex) const -> decltype(partial(0,0))
+    PartialRangeType
+    partial(size_t beginIndex, size_t endIndex) const &&
+    {
+      BOOST_ASSERT(beginIndex <= endIndex);
+      BOOST_ASSERT(this->end() - this->begin() >= endIndex);
+      return PartialRangeType(std::move(*this), beginIndex, endIndex);
+    }
+
+    auto slice(size_t firstIndex, size_t lastIndex) const & -> decltype(dummySelf()->partial(0,0))
     {
       return partial(firstIndex, lastIndex + 1);
     }
 
-    auto mid(size_t firstIndex, size_t size) const -> decltype(partial(0,0))
+    auto slice(size_t firstIndex, size_t lastIndex) const && -> decltype(dummySelf()->partial(0,0))
+    {
+      return std::move(*this).partial(firstIndex, lastIndex + 1);
+    }
+
+    auto mid(size_t firstIndex, size_t size) const & -> decltype(dummySelf()->partial(0,0))
     {
       return partial(firstIndex, firstIndex + size);
+    }
+
+    auto mid(size_t firstIndex, size_t size) const && -> decltype(dummySelf()->partial(0,0))
+    {
+      return std::move(*this).partial(firstIndex, firstIndex + size);
     }
 
     template <template <typename> class TContainer>

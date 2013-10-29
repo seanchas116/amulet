@@ -25,6 +25,12 @@ namespace Amulet {
       mPolicy(std::forward<TArgs>(policyArgs)...)
     {}
 
+    template <typename... TArgs>
+    explicit RangeAdaptor(base_range &&range, TArgs&&... policyArgs) :
+      mRange(std::move(range)),
+      mPolicy(std::forward<TArgs>(policyArgs)...)
+    {}
+
     const_iterator begin() const
     {
       return mPolicy.begin(mRange);
