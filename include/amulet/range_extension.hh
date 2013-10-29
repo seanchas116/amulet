@@ -97,6 +97,49 @@ namespace Amulet {
     private:
       function_type mFunc;
     };
+
+    template <typename TRange, typename TUnaryFunc>
+    struct FlatMapRangePolicy
+    {
+      using base_range = TRange;
+      using value_type = typename base_range::value_type;
+      using function_result = typename std::result_of<TUnaryFunc(value_type)>::type;
+      using function_type = std::function<function_result(const value_type &)>;
+      using map_iterator = boost::transform_iterator<
+        function_type,
+        typename base_range::const_iterator>;
+      using iterator = FlattenIterator<map_iterator>;
+
+      FlatMapRangePolicy() = default;
+      FlatMapRangePolicy(TUnaryFunc f) :
+        mFunc(f)
+      {}
+
+      iterator begin(const base_range &range) const
+      {
+        return iterator(mapEnd(range), mapBegin(range));
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return iterator(mapEnd(range), mapEnd(range));
+      }
+
+    private:
+
+      map_iterator mapBegin(const base_range &range) const
+      {
+        return map_iterator(std::begin(range), mFunc);
+      }
+
+      map_iterator mapEnd(const base_range &range) const
+      {
+        return map_iterator(std::end(range), mFunc);
+      }
+
+      function_type mFunc;
+    };
+
     
     template <typename TRange>
     struct FlattenRangePolicy
@@ -385,6 +428,9 @@ namespace Amulet {
     template <typename TFunc>
     using MapRangeType = ExtendedRangeAdaptor<detail::MapRangePolicy<self_type, TFunc>>;
 
+    template <typename TFunc>
+    using FlatMapRangeType = ExtendedRangeAdaptor<detail::FlatMapRangePolicy<self_type, TFunc>>;
+
     using FlattenRangeType = ExtendedRangeAdaptor<detail::FlattenRangePolicy<self_type>>;
     using ReverseRangeType = ExtendedRangeAdaptor<detail::ReverseRangePolicy<self_type>>;
 
@@ -408,7 +454,7 @@ namespace Amulet {
 
     template <typename TRangeRef>
     ZipRangeType<typename std::remove_reference<TRangeRef>::type>
-    zip(TRangeRef &&other) const &&
+    zip(TRangeRef &&other) &&
     {
       return ZipRangeType<typename std::remove_reference<TRangeRef>::type>(std::move(*this), std::forward<TRangeRef>(other));
     }
@@ -422,7 +468,7 @@ namespace Amulet {
 
     template <typename TFunc>
     FilterRangeType<TFunc>
-    filter(TFunc f) const &&
+    filter(TFunc f) &&
     {
       return FilterRangeType<TFunc>(std::move(*this), f);
     }
@@ -436,7 +482,7 @@ namespace Amulet {
 
     template <typename TFunc>
     MapRangeType<TFunc>
-    map(TFunc f) const &&
+    map(TFunc f) &&
     {
       return MapRangeType<TFunc>(std::move(*this), f);
     }
@@ -448,21 +494,23 @@ namespace Amulet {
     }
 
     FlattenRangeType
-    flatten() const &&
+    flatten() &&
     {
       return FlattenRangeType(std::move(*this));
     }
 
     template <typename TFunc>
-    auto flatMap(TFunc f) const & -> decltype(dummySelf()->map(f).flatten())
+    FlatMapRangeType<TFunc>
+    flatMap(TFunc f) const &
     {
-      return map(f).flatten();
+      return FlatMapRangeType<TFunc>(*this, f);
     }
 
     template <typename TFunc>
-    auto flatMap(TFunc f) const && -> decltype(dummySelf()->map(f).flatten())
+    FlatMapRangeType<TFunc>
+    flatMap(TFunc f) &&
     {
-      return std::move(*this).map().flatten();
+      return FlatMapRangeType<TFunc>(std::move(*this), f);
     }
 
     ReverseRangeType 
@@ -472,7 +520,7 @@ namespace Amulet {
     }
 
     ReverseRangeType
-    reverse() const &&
+    reverse() &&
     {
       return ReverseRangeType(std::move(*this));
     }
@@ -484,7 +532,7 @@ namespace Amulet {
     }
 
     WithIndexRangeType
-    withIndex() const &&
+    withIndex() &&
     {
       return WithIndexRangeType(std::move(*this));
     }
@@ -496,7 +544,7 @@ namespace Amulet {
     }
 
     UniqueRangeType
-    unique() const &&
+    unique() &&
     {
       return UniqueRangeType(std::move(*this));
     }
@@ -508,7 +556,7 @@ namespace Amulet {
     }
 
     FirstsRangeType
-    firsts() const &&
+    firsts() &&
     {
       return std::move(*this).map(detail::ReturnPairFirst<Value>());
     }
@@ -518,7 +566,7 @@ namespace Amulet {
       return firsts();
     }
  
-    auto keys() const && -> decltype(dummySelf()->firsts())
+    auto keys() && -> decltype(dummySelf()->firsts())
     {
       return std::move(*this).firsts();
     }
@@ -530,7 +578,7 @@ namespace Amulet {
     }
 
     SecondsRangeType
-    seconds() const &&
+    seconds() &&
     {
       return std::move(*this).map(detail::ReturnPairSecond<Value>());
     }
@@ -540,7 +588,7 @@ namespace Amulet {
       return seconds();
     }
 
-    auto values() const && -> decltype(dummySelf()->seconds())
+    auto values() && -> decltype(dummySelf()->seconds())
     {
       return std::move(*this).seconds();
     }
@@ -604,7 +652,7 @@ namespace Amulet {
       return narrow(1, 0);
     }
 
-    auto tail() const && -> decltype(dummySelf()->narrow(0,0))
+    auto tail() && -> decltype(dummySelf()->narrow(0,0))
     {
       return std::move(*this).narrow(1, 0);
     }
@@ -614,7 +662,7 @@ namespace Amulet {
       return narrow(0, 1);
     }
 
-    auto init() const && -> decltype(dummySelf()->narrow(0,0))
+    auto init() && -> decltype(dummySelf()->narrow(0,0))
     {
       return std::move(*this).narrow(0, 1);
     }
@@ -634,7 +682,7 @@ namespace Amulet {
     }
 
     PartialRangeType
-    partial(size_t beginIndex, size_t endIndex) const &&
+    partial(size_t beginIndex, size_t endIndex) &&
     {
       BOOST_ASSERT(beginIndex <= endIndex);
       BOOST_ASSERT(this->end() - this->begin() >= endIndex);
@@ -646,7 +694,7 @@ namespace Amulet {
       return partial(firstIndex, lastIndex + 1);
     }
 
-    auto slice(size_t firstIndex, size_t lastIndex) const && -> decltype(dummySelf()->partial(0,0))
+    auto slice(size_t firstIndex, size_t lastIndex) && -> decltype(dummySelf()->partial(0,0))
     {
       return std::move(*this).partial(firstIndex, lastIndex + 1);
     }
@@ -656,7 +704,7 @@ namespace Amulet {
       return partial(firstIndex, firstIndex + size);
     }
 
-    auto mid(size_t firstIndex, size_t size) const && -> decltype(dummySelf()->partial(0,0))
+    auto mid(size_t firstIndex, size_t size) && -> decltype(dummySelf()->partial(0,0))
     {
       return std::move(*this).partial(firstIndex, firstIndex + size);
     }
