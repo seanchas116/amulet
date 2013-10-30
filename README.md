@@ -18,6 +18,8 @@ All methods provided by RangeExtension is immutable (const) and most of the retu
 ### Some Examples
 
 ```cpp
+#include <amulet/range_extension.hh>
+
 RangeExtension<std::vector<int>> xs = {1,2,3};
 
 // produce a new container by transforming each value by a function
@@ -54,6 +56,8 @@ For detail, see the reference (at the bottom of this page).
 `Amulet::extend` wraps a normal container and make RangeExtension methods available.
 
 ```cpp
+#include <amulet/range_extension.hh>
+
 std::vector<int> vec = {1,2,3};
 auto twices = Amulet.extend(vec).map([](int x){
   return x * 2;
@@ -65,6 +69,8 @@ auto twices = Amulet.extend(vec).map([](int x){
 `Amulet::intRange` returns an integer range that has RangeExtension methods.
 
 ```cpp
+#include <amulet/int_range.hh>
+
 auto fizzbuzz = Amulet::intRange(0, 100).map([](int x)->std::string{
   if (x % 15 == 0)
     return "fizzbuzz";
@@ -80,16 +86,14 @@ std::copy(fizzbuzz.begin(), fizzbuzz.end(), std::ostream_iterator<std::string>(s
 std::cout << std::endl;
 ```
 
-### Weaknesses
-
-For safety and convenience, RangeExtension methods that returns a transformed container (e.g., `map`, `filter`) internally copy the original container.
-
-
 ## Query Macro (Comprehension)
 
 Amulet provides a comprehension syntax similar to LINQ query expressions, for-comrehension in Scala or do-notation in Haskell, using preprocessor macro.
 
 ```cpp
+#include <amulet/short_query_macro.hh>
+#include <amulet/range_extension.hh>
+
 template <typename T>
 using ExVector = Amulet::RangeExtension<std::vector<T>>;
 
@@ -139,6 +143,9 @@ While `boost::optional` is analogous to pointers, `Amulet::Option` is analogous 
 Since Option is analogous to containers, you can use query macro with Option values.
 
 ```cpp
+#include <amulet/short_query_macro.hh>
+#include <amulet/option.hh>
+
 auto divide = [](int x, int y) -> Amulet::Option<int>{
   if (y)
     return Amulet::some(x / y);  // succeeded
