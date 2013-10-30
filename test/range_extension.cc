@@ -219,3 +219,11 @@ TEST(RangeExtension, slice_mid)
   EXPECT_EQ(s, expected_s);
   EXPECT_EQ(m, expected_m);
 }
+
+TEST(RangeExtension, move)
+{
+  ExVector<int> xs = {1, 4, 6, 3};
+  auto r = std::move(xs).reverse();
+  ExVector<int> expected;
+  EXPECT_EQ(expected, xs);
+}
