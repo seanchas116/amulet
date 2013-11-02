@@ -1,8 +1,11 @@
 
-#include <amulet/short_query_macro.hh>
+#define BOOST_PP_VARIADICS 1
+
 #include <amulet/option.hh>
 #include <amulet/range_extension.hh>
+#include <amulet/short_query_macro.hh>
 #include <gtest/gtest.h>
+
 
 TEST(QueryMacro, option)
 {

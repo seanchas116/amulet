@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef BOOST_PP_VARIADICS
-#define BOOST_PP_VARIADICS
-#endif
-
 #include <boost/preprocessor.hpp>
 
 #define AMULET_FROM_INDEX 1
