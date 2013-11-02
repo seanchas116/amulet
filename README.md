@@ -90,6 +90,9 @@ std::cout << std::endl;
 
 Amulet provides a comprehension syntax similar to LINQ query expressions, for-comrehension in Scala or do-notation in Haskell, using preprocessor macro.
 
+**NOTE: On clang, add `#define BOOST_PP_VARIADICS 1` on top of your source code to use this feature.**  
+This enables variadic support of Boost.Preprocessor (on clang it is disabled by default but Amulet needs it).
+
 ```cpp
 #include <amulet/short_query_macro.hh>
 #include <amulet/range_extension.hh>
