@@ -227,3 +227,13 @@ TEST(RangeExtension, move)
   ExVector<int> expected;
   EXPECT_EQ(expected, xs);
 }
+
+TEST(RangeExtension, extend)
+{
+  std::vector<int> xs = {1,2,3};
+  auto mapped = Amulet::extend(xs).map([](int x){
+    return std::to_string(x);
+  });
+  auto expected = {"1","2","3"};
+  EXPECT_EQ(expected, mapped);
+}

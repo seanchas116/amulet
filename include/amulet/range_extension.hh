@@ -43,6 +43,23 @@ namespace Amulet {
       }
     };
 
+    template <typename TRange>
+    struct UnitRangePolicy
+    {
+      using base_range = TRange;
+      using iterator = typename base_range::const_iterator;
+
+      iterator begin(const base_range &range) const
+      {
+        return std::begin(range);
+      }
+
+      iterator end(const base_range &range) const
+      {
+        return std::end(range);
+      }
+    };
+
     template <typename TRange, typename TUnaryFunc>
     struct MapRangePolicy
     {
@@ -731,14 +748,16 @@ namespace Amulet {
   };
 
   template <typename TIterator>
-  inline ExtendedIteratorRange<TIterator> extend(TIterator begin, TIterator end)
+  inline ExtendedIteratorRange<TIterator>
+  extend(TIterator begin, TIterator end)
   {
     return ExtendedIteratorRange<TIterator>(begin, end);
   }
 
   template <typename TRange>
-  inline ExtendedIteratorRange<typename TRange::const_iterator> extend(const TRange &range)
+  inline ExtendedRangeAdaptor<detail::UnitRangePolicy<TRange>>
+  extend(const TRange &range)
   {
-    return extend(std::begin(range), std::end(range));
+    return ExtendedRangeAdaptor<detail::UnitRangePolicy<TRange>>(range);
   }
 }
