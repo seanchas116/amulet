@@ -756,9 +756,14 @@ namespace Amulet {
   }
 
   template <typename TRange>
-  inline ExtendedRangeAdaptor<detail::UnitRangePolicy<TRange>>
-  extend(const TRange &range)
+  inline
+  ExtendedRangeAdaptor<
+    detail::UnitRangePolicy<
+      typename std::remove_reference<TRange>::type>>
+  extend(TRange &&range)
   {
-    return ExtendedRangeAdaptor<detail::UnitRangePolicy<TRange>>(range);
+    return ExtendedRangeAdaptor<
+      detail::UnitRangePolicy<
+        typename std::remove_reference<TRange>::type>>(std::forward<TRange>(range));
   }
 }
