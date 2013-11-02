@@ -7,9 +7,10 @@
 #include "iterator_range.hh"
 #include "range_adaptor.hh"
 #include "option.hh"
+#include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/filter_iterator.hpp>
-#include <boost/range/adaptors.hpp>
-#include <boost/range/algorithm.hpp>
+#include <vector>
+#include <algorithm>
 
 namespace Amulet {
 
