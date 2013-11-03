@@ -11,4 +11,10 @@ namespace Amulet {
     return extend(IntIterator<T>(first), IntIterator<T>(last));
   }
 
+  template <typename T>
+  inline ExtendedIteratorRange<IntIterator<T>> times(T count)
+  {
+    return intRange(T(0), count);
+  }
+
 }
