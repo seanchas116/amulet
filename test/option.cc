@@ -42,3 +42,11 @@ TEST(Option, flatMap)
   EXPECT_EQ(false, r1.hasValue());
   EXPECT_EQ(0, r2.get());
 }
+
+TEST(Option, get)
+{
+  auto m = Amulet::some(0);
+  auto n = Amulet::Option<int>();
+  EXPECT_EQ(0, m.get());
+  EXPECT_EQ(1, n.getOr(1));
+}

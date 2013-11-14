@@ -89,8 +89,11 @@ namespace Amulet {
         return result();
     }
 
-    const T &get() const { return o.get(); }
-    T &get() { return o.get(); }
+    const_reference get() const { return o.get(); }
+    reference get() { return o.get(); }
+
+    const_reference getOr(const_reference substitution) const { return o.get_value_or(substitution); }
+    reference getOr(reference substitution) { return o.get_value_or(substitution); }
 
     const T *getPointer() const { return o.get_pointer(); }
     T *getPointer() { return o.get_pointer(); }
