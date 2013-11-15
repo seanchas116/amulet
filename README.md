@@ -1,7 +1,7 @@
 Amulet
 ======
 
-Amulet is a header-only C++ library that provides some functional programming support (mainly for containers and monads) like in Underscore.js, Ruby, Scala or LINQ.
+Amulet is a header-only C++11 library that provides some functional programming support (mainly for containers and monads) like in Underscore.js, Ruby, Scala or LINQ.
 
 - Add convenient functional methods to containers (`Amulet::RangeExtension`)
   - Lazy (deferred) evaluation of returned containers
