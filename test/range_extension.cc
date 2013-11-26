@@ -64,13 +64,33 @@ TEST(RangeExtension, find)
   EXPECT_EQ(false, b.hasValue());
 }
 
+TEST(RangeExtension, forAll)
+{
+  ExVector<int> xs = {1,2,3};
+  auto a = xs.forAll(1);
+  auto b = xs.forAll([](int x){return x > 0;});
+  EXPECT_EQ(false, a);
+  EXPECT_EQ(true, b);
+}
+
 TEST(RangeExtension, contains)
 {
   ExVector<int> xs = {1,2,3};
   auto a = xs.contains(1);
   auto b = xs.contains(0);
+  auto c = xs.contains([](int x){return x % 3;});
   EXPECT_EQ(true, a);
   EXPECT_EQ(false, b);
+  EXPECT_EQ(true, c);
+}
+
+TEST(RangeExtension, count)
+{
+  ExVector<int> xs = {1,2,1,4};
+  auto c1 = xs.count(1);
+  auto c2 = xs.count([](int x){return x % 2 == 0;});
+  EXPECT_EQ(2, c1);
+  EXPECT_EQ(2, c2);
 }
 
 TEST(RangeExtension, filter)
@@ -165,7 +185,7 @@ TEST(RangeExtension, sort)
 TEST(RangeExtension, sortBy)
 {
   ExVector<int> xs = {1,3,2,3,1};
-  auto sorted = xs.sortBy([](int x, int y){
+  auto sorted = xs.sort([](int x, int y){
     return x > y;
   });
   auto expected = ExVector<int>{3,3,2,1,1};

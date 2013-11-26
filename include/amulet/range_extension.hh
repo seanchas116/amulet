@@ -395,44 +395,83 @@ namespace Amulet {
       return memo;
     }
 
+    template <typename TBinaryFunc>
+    Value foldLeft(TBinaryFunc f) const
+    {
+      return tail().foldLeft(head(), f);
+    }
+
     template <typename TResult, typename TBinaryFunc>
     TResult foldRight(const TResult &init, TBinaryFunc f) const
     {
-      return reverse().folrLeft(init, f);
+      return reverse().foldLeft(init, f);
+    }
+
+    template <typename TBinaryFunc>
+    Value foldRight(TBinaryFunc f) const
+    {
+      return tail().foldRight(head(), f);
     }
 
     Value min() const
     {
-      return tail().foldLeft(head(), [](const Value &m, const Value &v){
-        return std::min(m, v);
+      return foldLeft([](const Value &x, const Value &y){
+        return std::min(x, y);
       });
     }
 
     Value max() const
     {
-      return tail().foldLeft(head(), [](const Value &m, const Value &v){
-        return std::max(m, v);
+      return foldLeft([](const Value &x, const Value &y){
+        return std::max(x, y);
       });
     }
-    
+
     template <typename TPredicate>
     Option<Value> find(TPredicate predicate) const
     {
-      Option<Value> result;
       for (const Value &x : *this) {
         if (predicate(x))
-          result = some(x);
+          return some(x);
       }
-      return result;
+      return none;
+    }
+
+    bool forAll(const Value &value) const
+    {
+      return forAll([&](const Value &x){
+        return x == value;
+      });
+    }
+
+    template <typename TPredicate, typename = typename std::result_of<TPredicate(const Value &)>::type>
+    bool forAll(TPredicate predicate) const
+    {
+      return std::all_of(this->begin(), this->end(), predicate);
     }
 
     bool contains(const Value &value) const
     {
-      for (const Value &x : *this) {
-        if (x == value)
-          return true;
-      }
-      return false;
+      return contains([&](const Value &x){
+        return x == value;
+      });
+    }
+
+    template <typename TPredicate, typename = typename std::result_of<TPredicate(const Value &)>::type>
+    bool contains(TPredicate predicate) const
+    {
+      return std::any_of(this->begin(), this->end(), predicate);
+    }
+
+    Difference count(const Value &value) const
+    {
+      return std::count(this->begin(), this->end(), value);
+    }
+
+    template <typename TPredicate, typename = typename std::result_of<TPredicate(const Value &)>::type>
+    Difference count(TPredicate predicate) const
+    {
+      return std::count_if(this->begin(), this->end(), predicate);
     }
 
   private:
@@ -611,40 +650,6 @@ namespace Amulet {
       return std::move(*this).seconds();
     }
 
-    RangeExtension<std::vector<Value>>
-    sort() const
-    {
-      auto vector = to<RangeExtension<std::vector<Value>>>();
-      std::sort(vector.begin(), vector.end());
-      return vector;
-    }
-
-    template <typename TBinaryFunc>
-    RangeExtension<std::vector<Value>>
-    sortBy(TBinaryFunc compare) const
-    {
-      auto vector = to<RangeExtension<std::vector<Value>>>();
-      std::sort(vector.begin(), vector.end(), compare);
-      return vector;
-    }
-
-    RangeExtension<std::vector<Value>>
-    stableSort() const
-    {
-      auto vector = to<RangeExtension<std::vector<Value>>>();
-      std::stable_sort(vector.begin(), vector.end());
-      return vector;
-    }
-
-    template <typename TBinaryFunc>
-    RangeExtension<std::vector<Value>>
-    stableSortBy(TBinaryFunc compare) const
-    {
-      auto vector = to<RangeExtension<std::vector<Value>>>();
-      std::stable_sort(vector.begin(), vector.end(), compare);
-      return vector;
-    }
-
     NarrowedRangeType
     narrow(size_t frontOffset, size_t backOffset) const &
     {
@@ -725,6 +730,40 @@ namespace Amulet {
     auto mid(size_t firstIndex, size_t size) && -> decltype(dummySelf()->partial(0,0))
     {
       return std::move(*this).partial(firstIndex, firstIndex + size);
+    }
+
+    RangeExtension<std::vector<Value>>
+    sort() const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::sort(vector.begin(), vector.end());
+      return vector;
+    }
+
+    template <typename TBinaryFunc>
+    RangeExtension<std::vector<Value>>
+    sort(TBinaryFunc compare) const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::sort(vector.begin(), vector.end(), compare);
+      return vector;
+    }
+
+    RangeExtension<std::vector<Value>>
+    stableSort() const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::stable_sort(vector.begin(), vector.end());
+      return vector;
+    }
+
+    template <typename TBinaryFunc>
+    RangeExtension<std::vector<Value>>
+    stableSort(TBinaryFunc compare) const
+    {
+      auto vector = to<RangeExtension<std::vector<Value>>>();
+      std::stable_sort(vector.begin(), vector.end(), compare);
+      return vector;
     }
 
     template <template <typename> class TContainer>
