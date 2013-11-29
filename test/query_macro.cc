@@ -3,7 +3,7 @@
 
 #include <amulet/option.hh>
 #include <amulet/range_extension.hh>
-#include <amulet/short_query_macro.hh>
+#include <amulet/dsl/short_query_macro.hh>
 #include <gtest/gtest.h>
 
 
