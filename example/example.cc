@@ -14,7 +14,9 @@ int main()
   });
 
   // comprehension like LINQ query expressions
+  // expanded into a nesting of lambdas, filter and flatMap methods
   auto fruitPrices1 = _do(
+    _referring(prices), // reference-capturing this variable in inner lambdas (the other variables are copy-captured)
     _from(pair, prices),
     _where(pair.first != "carrot"),
     _select(pair.second)
