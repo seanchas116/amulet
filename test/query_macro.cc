@@ -49,12 +49,14 @@ TEST(QueryMacro, range)
   auto ys = ExVector<int>{3,4};
   
   auto result1 = _do(
+    _referring(xs, ys),
     _from(x, xs),
     _from(y, ys),
     _where(y == 3),
     (ExVector<int>{x, y})
   );
   auto result2 = _do(
+    _referring(xs, ys),
     _from(x, xs),
     _from(y, ys),
     _select(x + y)

@@ -7,3 +7,4 @@
 #define _select(...) AMULET_SELECT(__VA_ARGS__)
 #define _where(...) AMULET_WHERE(__VA_ARGS__)
 #define _do(...) AMULET_DO(__VA_ARGS__)
+#define _referring(...) AMULET_REFERRING(__VA_ARGS__)
