@@ -3,8 +3,12 @@
 #include <amulet/range_extension.hh>
 #include <amulet/type_traits.hh>
 
-template <class TRange, class = typename std::enable_if<Amulet::IsRange<TRange>::value>::type>
-inline auto operator++(const TRange &range, int) -> decltype(Amulet::extend(range))
+template <class TRange>
+inline auto operator++(const TRange &range, int) ->
+  typename std::enable_if<
+    Amulet::IsRange<TRange>::value,
+    decltype(Amulet::extend(range))
+  >::type
 {
   return Amulet::extend(range);
 }
